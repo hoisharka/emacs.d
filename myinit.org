@@ -1,0 +1,495 @@
+#+STARTUP: overview 
+#+PROPERTY: header-args :comments yes :results silent
+
+* interface tweaks
+#+BEGIN_SRC emacs-lisp
+  (setq inhibit-startup-message t)
+  (tool-bar-mode -1)
+  (fset 'yes-or-no-p 'y-or-n-p)
+  (global-set-key (kbd "<f5>") 'revert-buffer)
+
+  (use-package desktop
+    :ensure t
+    :init
+    (desktop-save-mode 1))
+
+  (global-set-key (kbd "C-M-q") 'visual-line-mode)
+
+#+END_SRC
+
+* try
+#+BEGIN_SRC emacs-lisp
+(use-package try
+  :ensure t)
+#+END_SRC
+
+* which key
+#+BEGIN_SRC emacs-lisp
+(use-package which-key
+  :ensure t
+  :config
+  (which-key-mode))
+#+END_SRC
+
+* adaptive-wrap
+#+BEGIN_SRC emacs-lisp
+  (use-package adaptive-wrap
+    :ensure t
+    ;; as this package is available only in the gnu archive, this is
+    ;; technically not needed, but it helps to highlight where it
+    ;; comes from
+    :pin gnu)
+#+END_SRC
+
+* yasnippet
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :init
+      (yas-global-mode 1)
+    :config
+    (use-package yasnippet-snippets
+      :ensure t)
+    (yas-reload-all))
+#+END_SRC
+* org mode
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+    :ensure org-plus-contrib
+    :config
+    (require 'org-tempo)
+    (require 'ox-confluence)
+    (require 'ob-clojure)
+    (global-set-key "\C-cl" 'org-store-link)
+    (global-set-key "\C-ca" 'org-agenda)
+    (global-set-key "\C-cc" 'org-capture)
+    (global-set-key "\C-cb" 'org-switchb)
+    (org-defkey org-mode-map "\C-x\C-e" 'cider-eval-last-sexp)
+    (org-defkey org-mode-map "\C-c\C-d" 'cider-doc)
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((python . t)
+       (emacs-lisp . t)
+       (clojure . t)
+       (sh . t)
+       (C . t)
+       (js . t)
+       (ditaa . t)
+       (dot . t)
+       (org . t)
+       (latex . t )
+       ))
+    (setq org-publish-project-alist
+	  '(("org keyll publish"
+	     ;; Path to org files.
+	     :base-directory "~/hoisharka.github.io/_org"
+	     :base-extension "org"
+
+	     ;; Path to Jekyll Posts
+	     :publishing-directory "~/hoisharka.github.io/_posts/"
+	     :recursive t
+	     :publishing-function org-html-publish-to-html
+	     :headline-levels 4
+	     :html-extension "html"
+	     :body-only t
+	     ))))
+
+  (use-package org-bullets
+    :ensure t
+    :config
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+#+END_SRC
+* theme
+#+BEGIN_SRC emacs-lisp
+  ;; 테마 설정
+  (use-package dracula-theme
+    :ensure t
+    :config
+    (load-theme 'dracula t))
+
+#+END_SRC
+* htmlize
+#+BEGIN_SRC emacs-lisp
+  (use-package htmlize
+    :ensure t
+    :commands (htmlize-buffer
+               htmlize-file
+               htmlize-many-files
+               htmlize-many-files-dired
+               htmlize-region))
+#+END_SRC
+* clojure-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package clojure-mode
+    :ensure t
+    :init
+    (defconst clojure--prettify-symbols-alist
+      '(("fn"   . ?λ)
+	("__"   . ?⁈)))
+
+    :config
+    (add-hook 'clojure-mode-hook 'global-prettify-symbols-mode)
+    :bind (("C-c d f" . cider-code)
+	   ("C-c d g" . cider-grimoire)
+	   ("C-c d w" . cider-grimoire-web)
+	   ("C-c d c" . clojure-cheatsheet)
+	   ("C-c d d" . dash-at-point)))
+#+END_SRC
+* clj-refactor
+#+begin_src emacs-lisp
+  (defun my-clojure-mode-hook ()
+      (clj-refactor-mode 1)
+      (yas-minor-mode 1) ; for adding require/use/import statements
+      ;; This choice of keybinding leaves cider-macroexpand-1 unbound
+      (cljr-add-keybindings-with-prefix "C-c C-m"))
+
+
+  (use-package clj-refactor
+    :ensure t
+    :config
+    (add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
+    (setq cljr-favor-prefix-notation nil)
+    (setq cljr-favor-private-functions nil)
+
+    (cljr-add-keybindings-with-modifier "C-s-")
+    (define-key clj-refactor-map (kbd "C-x C-r") 'cljr-rename-file)
+
+    (define-key clojure-mode-map [remap paredit-forward] 'clojure-forward-logical-sexp)
+    (define-key clojure-mode-map [remap paredit-backward] 'clojure-backward-logical-sexp))
+#+end_src
+* cider
+#+BEGIN_SRC emacs-lisp
+  (use-package cider
+    :ensure t;;cider-hydra
+    :pin melpa-stable
+    :config
+    (add-hook 'cider-repl-mode-hook #'company-mode)
+    (add-hook 'cider-mode-hook #'company-mode)
+    (add-hook 'cider-mode-hook #'eldoc-mode)
+    ;;(add-hook 'cider-mode-hook #'cider-hydra-mode)
+    (add-hook 'clojure-mode-hook #'paredit-mode)
+    (setq cider-repl-use-pretty-printing t)
+    (setq cider-repl-display-help-banner nil)
+    (setq cider-jack-in-default 'lein)
+    (setq org-babel-clojure-backend 'cider)
+    (setq org-babel-clojure-sync-nrepl-timeout nil)
+    ;;    (setq cider-inject-dependencies-at-jack-in nil)
+    (setq cider-show-error-buffer nil)
+    (setq cider-cljs-lein-repl "(do (use 'figwheel-sidecar.repl-api) (start-figwheel!) (cljs-repl))")
+  
+    :bind (("M-r" . cider-ns-refresh)
+	   ("C-c r" . cider-repl-reset)
+	   ("C-c ." . cider-reset-test-run-tests))
+    )
+#+END_SRC
+* ob-clojure-literate
+  #+begin_src emacs-lisp
+    (require 'ob-clojure-literate)
+    (setq ob-clojure-literate-auto-jackin-p t)
+
+    ;;; no project, CIDER jack-in outside of project.
+    ;; ISSUE: can't use `clj-refactor'
+    ;; (setq ob-clojure-literate-project-location nil)
+    ;;; use `ob-clojure/' as ob-clojure-literate project.
+    (setq ob-clojure-literate-project-location
+	  (expand-file-name (concat user-emacs-directory "Org-mode/")))
+    (setq ob-clojure-literate-default-session "*cider-repl ob-clojure*")
+
+    ;; (add-hook 'org-mode-hook #'ob-clojure-literate-mode)
+    (define-key org-babel-map (kbd "M-c") 'ob-clojure-literate-mode)
+  #+end_src
+* python
+#+BEGIN_SRC emacs-lisp
+  (use-package elpy
+    :ensure t
+    :config
+    (elpy-enable))
+#+END_SRC
+* multiple-cursor
+#+BEGIN_SRC emacs-lisp
+  (use-package multiple-cursors
+    :ensure t
+    :config
+    (progn
+      (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+      (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+      (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+      (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)))
+#+END_SRC
+
+* flycheck
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :init
+    (global-flycheck-mode t))
+#+END_SRC
+
+* markdown
+#+BEGIN_SRC emacs-lisp
+  (use-package markdown-mode
+    :ensure t
+    :commands (markdown-mode gfm-mode)
+    :mode (("README\\.md\\'" . gfm-mode)
+           ("\\.md\\'" . markdown-mode)
+           ("\\.markdown\\'" . markdown-mode))
+    :init (setq markdown-command "multimarkdown"))
+#+END_SRC
+* google translate
+#+BEGIN_SRC emacs-lisp
+  ;; google translate
+  (use-package google-translate
+    :ensure t
+    :config
+    (require 'google-translate-smooth-ui)
+    (setq google-translate-translation-directions-alist
+          '(("en" . "ko") ("ko" . "en")))
+    (setq google-translate-output-destination nil)
+    (setq google-translate-pop-up-buffer-set-focus t)
+    (setq google-translate-default-source-language "en")
+    (setq google-translate-default-target-language "ko")
+    (global-set-key "\C-ct" 'google-translate-smooth-translate))
+
+  ;; (use-package google-translate
+  ;;   :ensure t
+  ;;   :config
+  ;;   (require 'google-translate-default-ui)
+  ;;   (setq google-translate-default-source-language "en")
+  ;;   (setq google-translate-default-target-language "ko")
+  ;;   (global-set-key "\C-ct" 'google-translate-at-point)
+  ;;   (global-set-key "\C-cT" 'google-translate-query-translate))
+
+#+END_SRC
+* font
+#+BEGIN_SRC emacs-lisp
+
+  (set-frame-font "d2coding" t)
+  (set-face-font 'default "d2coding-12")
+  (set-fontset-font "fontset-default" '(#x1100 . #xffdc)
+                    '("nanumgothiccoding" . "unicode-bmp"))
+  (setq face-font-rescale-alist
+        '(("nanumgothiccoding" . 1.0)))
+
+  (defvar my-org-html-export-theme 'leuven)
+
+  (defun my-with-theme (orig-fun &rest args)
+    "ORIG-FUN? ARGS? org 파일을 html로 export할 때 테마를 지정하다."
+    (load-theme my-org-html-export-theme)
+    (unwind-protect
+        (apply orig-fun args)
+      (disable-theme my-org-html-export-theme)))
+
+#+END_SRC
+* babel
+#+BEGIN_SRC emacs-lisp
+(defvar org-html-htmlize-output-type)
+(setq org-html-htmlize-output-type 'css)
+#+END_SRC
+* ox-html
+
+(with-eval-after-load "ox-html"
+  (advice-add 'org-export-to-buffer :around 'my-with-theme))
+* swiper
+#+BEGIN_SRC emacs-lisp
+  ;; it looks like counsel is a requirement for swiper
+  (use-package counsel
+    :ensure t
+    )
+
+  (use-package swiper
+    :ensure try
+    :config
+    (progn
+      (ivy-mode 1)
+      (setq ivy-use-virtual-buffers t)
+      (global-set-key "\C-s" 'swiper)
+      (global-set-key (kbd "C-c C-r") 'ivy-resume)
+      (global-set-key (kbd "<f6>") 'ivy-resume)
+      (global-set-key (kbd "M-x") 'counsel-M-x)
+      (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+      (global-set-key (kbd "<f1> f") 'counsel-describe-function)
+      (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+      (global-set-key (kbd "<f1> l") 'counsel-load-library)
+      (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+      (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
+      (global-set-key (kbd "C-c g") 'counsel-git)
+      (global-set-key (kbd "C-c j") 'counsel-git-grep)
+      (global-set-key (kbd "C-c k") 'counsel-ag)
+      (global-set-key (kbd "C-x l") 'counsel-locate)
+      (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
+      (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+      ))
+#+END_SRC
+
+* ov
+#+BEGIN_SRC emacs-lisp
+  (use-package ov
+    :ensure t)
+#+END_SRC
+
+* Justifying LaTeX preview fragments in org-mode
+#+BEGIN_SRC emacs-lisp
+  ;; specify the justification you want
+  (plist-put org-format-latex-options :justify 'center)
+
+  (defun org-justify-fragment-overlay (beg end image imagetype)
+    "Adjust the justification of a LaTeX fragment.
+  The justification is set by :justify in
+  `org-format-latex-options'. Only equations at the beginning of a
+  line are justified."
+    (defun t-width ()
+      ;;(window-text-width)
+      (window-max-chars-per-line)
+      )
+
+    (cond
+     ;; Centered justification
+     ((and (eq 'center (plist-get org-format-latex-options :justify)) 
+	   (= beg (line-beginning-position)))
+      (let* ((img (create-image image 'imagemagick t))
+	     (width (car (image-size img)))
+	     (offset (floor (- (/ (t-width) 2) (/ width 2)))))
+	(overlay-put (ov-at) 'before-string (make-string offset ? ))))
+     ;; Right justification
+     ((and (eq 'right (plist-get org-format-latex-options :justify)) 
+	   (= beg (line-beginning-position)))
+      (let* ((img (create-image image 'imagemagick t))
+	     (width (car (image-display-size (overlay-get (ov-at) 'display))))
+	     (offset (floor (- (t-width) width (- (line-end-position) end)))))
+	(overlay-put (ov-at) 'before-string (make-string offset ? ))))))
+
+  (defun org-latex-fragment-tooltip (beg end image imagetype)
+    "Add the fragment tooltip to the overlay and set click function to toggle it."
+    (overlay-put (ov-at) 'help-echo
+		 (concat (buffer-substring beg end)
+			 "mouse-1 to toggle."))
+    (overlay-put (ov-at) 'local-map (let ((map (make-sparse-keymap)))
+				      (define-key map [mouse-1]
+					`(lambda ()
+					   (interactive)
+					   (org-remove-latex-fragment-image-overlays ,beg ,end)))
+				      map)))
+
+  ;; advise the function to a
+  (advice-add 'org--format-latex-make-overlay :after 'org-justify-fragment-overlay)
+  (advice-add 'org--format-latex-make-overlay :after 'org-latex-fragment-tooltip)
+
+  ;;That is it. If you get tired of the advice, remove it like this:
+  ;;(advice-remove 'org--format-latex-make-overlay 'org-justify-fragment-overlay)
+  ;;(advice-remove 'org--format-latex-make-overlay 'org-latex-fragment-tooltip)
+#+END_SRC
+
+* latex option
+#+BEGIN_SRC emacs-lisp
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
+#+END_SRC
+* swap-windows
+  #+begin_src emacs-lisp
+    (use-package ace-window
+      :ensure t
+      :pin melpa-stable
+      :init
+      (progn
+	(global-set-key [remap other-window] 'ace-window)
+	(custom-set-faces
+	 '(aw-leading-char-face
+	   ((t (:inherit ace-jump-face-foreground :height 3.0))))) 
+	))
+    ;; set up my own map
+    (eval-when-compile
+      (defvar z-map))
+      
+    (define-prefix-command 'z-map)
+    (global-set-key (kbd "C-1") 'z-map)
+
+    ;; swap window
+    (defun z/swap-windows ()
+      "Swap widnow."
+      (interactive)
+      (ace-swap-window)
+      (aw-flip-window))
+
+    (define-key z-map (kbd "w") 'z/swap-windows)
+  #+end_src
+* paredit
+  #+begin_src emacs-lisp
+    (use-package paredit
+      :ensure t
+      :config 
+      (progn
+	(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+	(add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+	(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+	(add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+	(add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+	(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+	(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+	(add-hook 'clojure-mode-hook          #'enable-paredit-mode)
+	(add-hook 'clojurescript-mode-hook    #'enable-paredit-mode)
+	))
+  #+end_src
+
+* company-mode
+  #+begin_src emacs-lisp
+    (use-package company
+      :ensure t
+      :config
+      (global-company-mode))
+  #+end_src
+* magit
+#+begin_src emacs-lisp
+  (use-package magit
+    :ensure t
+    :init
+    (progn
+    (bind-key "C-x g" 'magit-status)
+    ))
+
+    (use-package git-gutter
+    :ensure t
+    :init
+    (global-git-gutter-mode +1))
+
+    (global-set-key (kbd "M-g M-g") 'hydra-git-gutter/body)
+
+
+    (use-package git-timemachine
+    :ensure t
+    )
+  (defhydra hydra-git-gutter (:body-pre (git-gutter-mode 1)
+			      :hint nil)
+    "
+  Git gutter:
+    _j_: next hunk        _s_tage hunk     _q_uit
+    _k_: previous hunk    _r_evert hunk    _Q_uit and deactivate git-gutter
+    ^ ^                   _p_opup hunk
+    _h_: first hunk
+    _l_: last hunk        set start _R_evision
+  "
+    ("j" git-gutter:next-hunk)
+    ("k" git-gutter:previous-hunk)
+    ("h" (progn (goto-char (point-min))
+		(git-gutter:next-hunk 1)))
+    ("l" (progn (goto-char (point-min))
+		(git-gutter:previous-hunk 1)))
+    ("s" git-gutter:stage-hunk)
+    ("r" git-gutter:revert-hunk)
+    ("p" git-gutter:popup-hunk)
+    ("R" git-gutter:set-start-revision)
+    ("q" nil :color blue)
+    ("Q" (progn (git-gutter-mode -1)
+		;; git-gutter-fringe doesn't seem to
+		;; clear the markup right away
+		(sit-for 0.1)
+		(git-gutter:clear))
+	 :color blue))
+#+end_src
+* beacon
+  It highlight cursor position when buffer changed.
+  #+begin_src emacs-lisp
+    (use-package beacon
+      :ensure t
+      :config
+      (beacon-mode 1))
+  #+end_src
