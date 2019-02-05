@@ -52,7 +52,7 @@
       :ensure t)
     (yas-reload-all))
 #+END_SRC
-* org mode
+* org-mode
 #+BEGIN_SRC emacs-lisp
   (use-package org
     :ensure org-plus-contrib
@@ -64,8 +64,8 @@
     (global-set-key "\C-ca" 'org-agenda)
     (global-set-key "\C-cc" 'org-capture)
     (global-set-key "\C-cb" 'org-switchb)
-    (org-defkey org-mode-map "\C-x\C-e" 'cider-eval-last-sexp)
-    (org-defkey org-mode-map "\C-c\C-d" 'cider-doc)
+    ;; (org-defkey org-mode-map "\C-x\C-e" 'cider-eval-last-sexp)
+    ;; (org-defkey org-mode-map "\C-c\C-d" 'cider-doc)
     (org-babel-do-load-languages
      'org-babel-load-languages
      '((python . t)
@@ -130,6 +130,7 @@
 
     :config
     (add-hook 'clojure-mode-hook 'global-prettify-symbols-mode)
+    (add-hook 'clojure-mode-hook 'linum-mode)
     :bind (("C-c d f" . cider-code)
 	   ("C-c d g" . cider-grimoire)
 	   ("C-c d w" . cider-grimoire-web)
@@ -139,19 +140,19 @@
 * clj-refactor
 #+begin_src emacs-lisp
   (defun my-clojure-mode-hook ()
-      (clj-refactor-mode 1)
-      (yas-minor-mode 1) ; for adding require/use/import statements
-      ;; This choice of keybinding leaves cider-macroexpand-1 unbound
-      (cljr-add-keybindings-with-prefix "C-c C-m"))
+    (clj-refactor-mode 1)
+    (yas-minor-mode 1) ;; for adding require/use/import statements
+    ;; This choice of keybinding leaves cider-macroexpand-1 unbound
+    (cljr-add-keybindings-with-prefix "C-c C-m"))
 
 
   (use-package clj-refactor
     :ensure t
     :config
     (add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
-    (setq cljr-favor-prefix-notation nil)
-    (setq cljr-favor-private-functions nil)
-
+    ;; (setq cljr-favor-prefix-notation nil)
+    ;; (setq cljr-favor-private-functions nil)
+    (setq cljr-hotload-dependencies t)
     (cljr-add-keybindings-with-modifier "C-s-")
     (define-key clj-refactor-map (kbd "C-x C-r") 'cljr-rename-file)
 
@@ -168,22 +169,22 @@
     (add-hook 'cider-mode-hook #'company-mode)
     (add-hook 'cider-mode-hook #'eldoc-mode)
     ;;(add-hook 'cider-mode-hook #'cider-hydra-mode)
-    (add-hook 'clojure-mode-hook #'paredit-mode)
+    (add-hook 'clojure-mode-hook #'paredit-mopde)
     (setq cider-repl-use-pretty-printing t)
     (setq cider-repl-display-help-banner nil)
     (setq cider-jack-in-default 'lein)
     (setq org-babel-clojure-backend 'cider)
     (setq org-babel-clojure-sync-nrepl-timeout nil)
-    ;;    (setq cider-inject-dependencies-at-jack-in nil)
-    (setq cider-show-error-buffer nil)
+    ;; (setq cider-inject-dependencies-at-jack-in nil)
+    ;; (setq cider-show-error-buffer nil)
     (setq cider-cljs-lein-repl "(do (use 'figwheel-sidecar.repl-api) (start-figwheel!) (cljs-repl))")
-  
+
     :bind (("M-r" . cider-ns-refresh)
 	   ("C-c r" . cider-repl-reset)
 	   ("C-c ." . cider-reset-test-run-tests))
     )
 #+END_SRC
-* ob-clojure-literate
+* COMMENT ob-clojure-literate
   #+begin_src emacs-lisp
     (require 'ob-clojure-literate)
     (setq ob-clojure-literate-auto-jackin-p t)
@@ -204,7 +205,7 @@
   (use-package elpy
     :ensure t
     :config
-    (elpy-enable))
+    (add-hook 'python-mode-hook 'elpy-mode))
 #+END_SRC
 * multiple-cursor
 #+BEGIN_SRC emacs-lisp
@@ -217,7 +218,6 @@
       (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
       (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)))
 #+END_SRC
-
 * flycheck
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
@@ -283,8 +283,8 @@
 #+END_SRC
 * babel
 #+BEGIN_SRC emacs-lisp
-(defvar org-html-htmlize-output-type)
-(setq org-html-htmlize-output-type 'css)
+  (defvar org-html-htmlize-output-type)
+  (setq org-html-htmlize-output-type 'css)
 #+END_SRC
 * ox-html
 
@@ -427,15 +427,18 @@
 	(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
 	(add-hook 'clojure-mode-hook          #'enable-paredit-mode)
 	(add-hook 'clojurescript-mode-hook    #'enable-paredit-mode)
+	(setq show-paren-mode 1)
 	))
+
+	
   #+end_src
 
 * company-mode
   #+begin_src emacs-lisp
     (use-package company
       :ensure t
-      :config
-      (global-company-mode))
+      :defer t
+      :config (global-company-mode))
   #+end_src
 * magit
 #+begin_src emacs-lisp
@@ -443,22 +446,22 @@
     :ensure t
     :init
     (progn
-    (bind-key "C-x g" 'magit-status)
-    ))
+      (bind-key "C-x g" 'magit-status)
+      ))
 
-    (use-package git-gutter
+  (use-package git-gutter
     :ensure t
     :init
     (global-git-gutter-mode +1))
 
-    (global-set-key (kbd "M-g M-g") 'hydra-git-gutter/body)
+  (global-set-key (kbd "M-g M-g") 'hydra-git-gutter/body)
 
 
-    (use-package git-timemachine
+  (use-package git-timemachine
     :ensure t
     )
   (defhydra hydra-git-gutter (:body-pre (git-gutter-mode 1)
-			      :hint nil)
+					:hint nil)
     "
   Git gutter:
     _j_: next hunk        _s_tage hunk     _q_uit
@@ -483,7 +486,7 @@
 		;; clear the markup right away
 		(sit-for 0.1)
 		(git-gutter:clear))
-	 :color blue))
+     :color blue))
 #+end_src
 * beacon
   It highlight cursor position when buffer changed.
@@ -502,4 +505,28 @@
       kept-new-versions 20   ; how many of the newest versions to keep
       kept-old-versions 5    ; and how many of the old
       )
+  #+end_src
+* shell pop
+  #+begin_src emacs-lisp
+    (use-package shell-pop
+      :ensure t
+      :config
+      (global-set-key (kbd "<C-M-return>") 'shell-pop))
+  #+end_src
+* yml
+  #+begin_src emacs-lisp
+    (use-package yaml-mode
+      :ensure t)
+  #+end_src
+* web-mode
+  #+begin_src emacs-lisp
+    (use-package web-mode
+      :ensure t
+      :config
+      (progn
+	(defun web-mode-init-hook ()
+	  "Hooks for Web mode.  Adjust indent."
+	  (setq web-mode-markup-indent-offset 2)
+	  (setq web-mode-code-indent-offset 2))
+	(add-hook 'web-mode-hook  'web-mode-init-hook)))
   #+end_src
