@@ -119,6 +119,14 @@
                htmlize-many-files-dired
                htmlize-region))
 #+END_SRC
+* company-mode
+  #+begin_src emacs-lisp
+    (use-package company
+      :ensure t
+      :defer t
+      :config (add-hook 'after-init-hook 'global-company-mode)
+      )
+  #+end_src
 * clojure-mode
 #+BEGIN_SRC emacs-lisp
   (use-package clojure-mode
@@ -130,7 +138,7 @@
 
     :config
     (add-hook 'clojure-mode-hook 'global-prettify-symbols-mode)
-    (add-hook 'clojure-mode-hook 'linum-mode)
+    (add-hook 'clojure-mode-hook (lambda () (linum-mode 1)))
     :bind (("C-c d f" . cider-code)
 	   ("C-c d g" . cider-grimoire)
 	   ("C-c d w" . cider-grimoire-web)
@@ -165,18 +173,18 @@
     :ensure t;;cider-hydra
     :pin melpa-stable
     :config
-    (add-hook 'cider-repl-mode-hook #'company-mode)
-    (add-hook 'cider-mode-hook #'company-mode)
-    (add-hook 'cider-mode-hook #'eldoc-mode)
+    ;;(add-hook 'cider-repl-mode-hook #'company-mode)
+    ;;(add-hook 'cider-mode-hook #'company-mode)
+    ;;(add-hook 'cider-mode-hook #'eldoc-mode)
     ;;(add-hook 'cider-mode-hook #'cider-hydra-mode)
-    (add-hook 'clojure-mode-hook #'paredit-mopde)
+    (add-hook 'clojure-mode-hook #'paredit-mode)
     (setq cider-repl-use-pretty-printing t)
     (setq cider-repl-display-help-banner nil)
     (setq cider-jack-in-default 'lein)
     (setq org-babel-clojure-backend 'cider)
     (setq org-babel-clojure-sync-nrepl-timeout nil)
     ;; (setq cider-inject-dependencies-at-jack-in nil)
-    ;; (setq cider-show-error-buffer nil)
+    (setq cider-show-error-buffer nil)
     (setq cider-cljs-lein-repl "(do (use 'figwheel-sidecar.repl-api) (start-figwheel!) (cljs-repl))")
 
     :bind (("M-r" . cider-ns-refresh)
@@ -433,13 +441,6 @@
 	
   #+end_src
 
-* company-mode
-  #+begin_src emacs-lisp
-    (use-package company
-      :ensure t
-      :defer t
-      :config (global-company-mode))
-  #+end_src
 * magit
 #+begin_src emacs-lisp
   (use-package magit
