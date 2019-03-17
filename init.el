@@ -13,6 +13,8 @@
                          ("org" . "https://orgmode.org/elpa/")))
 (package-initialize)
 
+(prefer-coding-system 'utf-8)
+
 ;; fetch the list of packages available
 (unless package-archive-contents
   (package-refresh-contents))
