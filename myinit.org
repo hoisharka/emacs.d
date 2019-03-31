@@ -60,6 +60,8 @@
     (require 'org-tempo)
     (require 'ox-confluence)
     (require 'ob-clojure)
+    (require 'ob-js)
+    (require 'ob-shell)
     (global-set-key "\C-cl" 'org-store-link)
     (global-set-key "\C-ca" 'org-agenda)
     (global-set-key "\C-cc" 'org-capture)
@@ -71,7 +73,7 @@
      '((python . t)
        (emacs-lisp . t)
        (clojure . t)
-       (sh . t)
+       (shell . t)
        (C . t)
        (js . t)
        (ditaa . t)
@@ -79,6 +81,9 @@
        (org . t)
        (latex . t )
        ))
+    (add-to-list 'exec-path (getenv "PATH"))
+    (add-to-list 'org-babel-tangle-lang-exts '("js" . "js"))
+
     (setq org-publish-project-alist
 	  '(("org keyll publish"
 	     ;; Path to org files.
@@ -98,15 +103,6 @@
     :ensure t
     :config
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-
-#+END_SRC
-* theme
-#+BEGIN_SRC emacs-lisp
-  ;; 테마 설정
-  (use-package dracula-theme
-    :ensure t
-    :config
-    (load-theme 'dracula t))
 
 #+END_SRC
 * htmlize
@@ -530,4 +526,103 @@
 	  (setq web-mode-markup-indent-offset 2)
 	  (setq web-mode-code-indent-offset 2))
 	(add-hook 'web-mode-hook  'web-mode-init-hook)))
+  #+end_src
+* theme
+#+BEGIN_SRC emacs-lisp
+  ;; 테마 설정
+  (use-package dracula-theme
+    :ensure t
+    :config
+    (load-theme 'dracula t))
+
+#+END_SRC
+* Web Mode
+  #+begin_src emacs-lisp
+    (use-package web-mode
+      :ensure t
+      :config
+      (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+      (add-to-list 'auto-mode-alist '("\\.vue?\\'" . web-mode))
+      (setq web-mode-engines-alist
+	    '(("django"    . "\\.html\\'")))
+      (setq web-mode-ac-sources-alist
+	    '(("css" . (ac-source-css-property))
+	      ("vue" . (ac-source-words-in-buffer ac-source-abbrev))
+	      ("html" . (ac-source-words-in-buffer ac-source-abbrev))))
+      (setq web-mode-enable-auto-closing t))
+    (setq web-mode-enable-auto-quoting t) ; this fixes the quote problem I mentioned
+  #+end_src
+* javascript
+  #+begin_src emacs-lisp
+    (use-package js2-mode
+      :ensure t
+      :ensure ac-js2
+      :init
+      (progn
+	(add-hook 'js-mode-hook 'js2-minor-mode)
+	(add-hook 'js2-mode-hook 'ac-js2-mode)
+	))
+
+    (use-package js2-refactor
+      :ensure t
+      :config 
+      (progn
+	(js2r-add-keybindings-with-prefix "C-c C-m")
+	;; eg. extract function with `C-c C-m ef`.
+	(add-hook 'js2-mode-hook #'js2-refactor-mode)))
+
+    (use-package tern
+      :ensure tern
+      :ensure tern-auto-complete
+      :config
+      (progn
+	(add-hook 'js-mode-hook (lambda () (tern-mode t)))
+	(add-hook 'js2-mode-hook (lambda () (tern-mode t)))
+	(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+	;;(tern-ac-setup)
+	))
+
+    ;;(use-package jade
+    ;;:ensure t
+    ;;)
+
+    ;; use web-mode for .jsx files
+    (add-to-list 'auto-mode-alist '("\\.jsx$" . web-mode))
+
+
+    ;; turn on flychecking globally
+    (add-hook 'after-init-hook #'global-flycheck-mode)
+
+    ;; disable jshint since we prefer eslint checking
+    (setq-default flycheck-disabled-checkers
+		  (append flycheck-disabled-checkers
+			  '(javascript-jshint)))
+
+    ;; use eslint with web-mode for jsx files
+    (flycheck-add-mode 'javascript-eslint 'web-mode)
+
+    ;; customize flycheck temp file prefix
+    (setq-default flycheck-temp-prefix ".flycheck")
+
+    ;; disable json-jsonlist checking for json files
+    (setq-default flycheck-disabled-checkers
+		  (append flycheck-disabled-checkers
+			  '(json-jsonlist)))
+
+    ;; adjust indents for web-mode to 2 spaces
+    (defun my-web-mode-hook ()
+      "Hooks for Web mode. Adjust indents"
+      ;;; http://web-mode.org/
+      (setq web-mode-markup-indent-offset 2)
+      (setq web-mode-css-indent-offset 2)
+      (setq web-mode-code-indent-offset 2))
+    (add-hook 'web-mode-hook  'my-web-mode-hook)
+  #+end_src
+* path
+  #+begin_src emacs-lisp
+    (use-package exec-path-from-shell
+      :ensure t
+      :config
+      (exec-path-from-shell-initialize)
+      )
   #+end_src
