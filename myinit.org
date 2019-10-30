@@ -515,7 +515,16 @@
     (use-package yaml-mode
       :ensure t)
   #+end_src
-* web-mode
+* theme
+#+BEGIN_SRC emacs-lisp
+  ;; 테마 설정
+  (use-package dracula-theme
+    :ensure t
+    :config
+    (load-theme 'dracula t))
+
+#+END_SRC
+* COMMENT web-mode
   #+begin_src emacs-lisp
     (use-package web-mode
       :ensure t
@@ -527,16 +536,7 @@
 	  (setq web-mode-code-indent-offset 2))
 	(add-hook 'web-mode-hook  'web-mode-init-hook)))
   #+end_src
-* theme
-#+BEGIN_SRC emacs-lisp
-  ;; 테마 설정
-  (use-package dracula-theme
-    :ensure t
-    :config
-    (load-theme 'dracula t))
-
-#+END_SRC
-* Web Mode
+* COMMENT Web Mode
   #+begin_src emacs-lisp
     (use-package web-mode
       :ensure t
@@ -552,7 +552,7 @@
       (setq web-mode-enable-auto-closing t))
     (setq web-mode-enable-auto-quoting t) ; this fixes the quote problem I mentioned
   #+end_src
-* javascript
+* COMMENT javascript
   #+begin_src emacs-lisp
     (use-package js2-mode
       :ensure t
@@ -571,16 +571,16 @@
 	;; eg. extract function with `C-c C-m ef`.
 	(add-hook 'js2-mode-hook #'js2-refactor-mode)))
 
-    (use-package tern
-      :ensure tern
-      :ensure tern-auto-complete
-      :config
-      (progn
-	(add-hook 'js-mode-hook (lambda () (tern-mode t)))
-	(add-hook 'js2-mode-hook (lambda () (tern-mode t)))
-	(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-	;;(tern-ac-setup)
-	))
+    ;; (use-package tern
+    ;;   :ensure tern
+    ;;   :ensure tern-auto-complete
+    ;;   :config
+    ;;   (progn
+    ;;     (add-hook 'js-mode-hook (lambda () (tern-mode t)))
+    ;;     (add-hook 'js2-mode-hook (lambda () (tern-mode t)))
+    ;;     (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+    ;;     ;;(tern-ac-setup)
+    ;;     ))
 
     ;;(use-package jade
     ;;:ensure t
@@ -626,3 +626,25 @@
       (exec-path-from-shell-initialize)
       )
   #+end_src
+* ox-hugo
+  #+begin_src elisp
+    (use-package ox-hugo
+      :ensure t
+      :after ox
+      :config
+      (setq org-hugo-default-section-directory "post"))
+  #+end_src
+* shell
+  #+begin_src elisp
+    (push (cons "\\*shell\\*" display-buffer--same-window-action) display-buffer-alist)
+  #+end_src
+
+* delete region
+  #+begin_src elisp
+    (bind-keys
+     :map global-map
+     ("C-x C-k" . delete-region))
+  #+end_src
+
+
+
