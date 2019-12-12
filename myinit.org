@@ -703,8 +703,8 @@
       (next-line arg))
 
       (global-set-key (kbd "C-S-D") 'duplicate-line)
-
+  #+end_src
 * linum
   #+begin_src emacs-lisp
     (global-linum-mode t)
-
+  #+end_src
