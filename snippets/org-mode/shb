@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: shb
+# key: shb
+# expand-env:
+# --
+#!/bin/bash
