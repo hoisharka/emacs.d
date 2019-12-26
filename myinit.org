@@ -708,3 +708,20 @@
   #+begin_src emacs-lisp
     (global-linum-mode t)
   #+end_src
+* COMMENT command to control
+  #+begin_src emacs-lisp
+    (setq mac-command-modifier nil)
+  #+end_src
+* mac setting
+  https://drypot.wordpress.com/2019/02/14/emacs-2주-삽질기/
+  #+begin_src emacs-lisp
+    (when (eq system-type 'darwin)
+     (setq default-input-method "korean-hangul")
+     (global-set-key (kbd "<f17>") 'toggle-input-method)
+     (setq mac-command-modifier 'control)
+     (setq mac-command-modifier 'control)
+    )
+  #+end_src
+
+
+
