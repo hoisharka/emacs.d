@@ -736,7 +736,7 @@
 
 
 
-* python anaconda
+* COMMENT python anaconda
   #+begin_src emacs-lisp
     (use-package python
       :mode ("\\.py\\'" . python-mode)
@@ -764,7 +764,7 @@
                 "flake8"))
       )
   #+end_src
-* python anaconda-mode
+* COMMENT python anaconda-mode
   #+begin_src emacs-lisp
     (use-package anaconda-mode
       :ensure t
@@ -780,7 +780,7 @@
       :after company
       :init (add-to-list 'company-backends #'company-anaconda))
   #+end_src
-* python unit test
+* COMMENT python unit test
   #+begin_src emacs-lisp
     (use-package nose
       :commands (nosetests-one
@@ -807,7 +807,7 @@
   #+end_src
 
   #+RESULTS:
-* python jedi
+* COMMENT python jedi
   #+begin_src emacs-lisp
     (use-package jedi
       :ensure t
