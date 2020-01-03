@@ -728,9 +728,94 @@
   #+end_src
 
 
-
 * org-textile
   #+begin_src emacs-lisp
     (add-to-list 'load-path "~/.emacs.d/custom/org-textile/")
     (require 'ox-textile)
+  #+end_src
+
+
+
+* python anaconda
+  #+begin_src emacs-lisp
+    (use-package python
+      :mode ("\\.py\\'" . python-mode)
+      ("\\.wsgi$" . python-mode)
+      :interpreter ("python" . python-mode)
+
+      :init
+      (setq-default indent-tabs-mode nil)
+
+      :config
+      (setq python-indent-offset 4)
+      ;; TODO pyvenv
+      (setq flycheck-python-pycompile-executable
+            (or (executable-find "python")
+                (executable-find "C:/Anaconda3/python.exe")
+                "python"))
+
+      (setq flycheck-python-pylint-executable
+            (or (executable-find "pylint")
+                (executable-find "C:/Anaconda3/Scripts/pylint.exe")
+                "pylint"))
+      (setq flycheck-python-flake8-executable
+            (or (executable-find "flake8")
+                (executable-find "C:/Anaconda3/envs/python3.7/Scripts/flake8.exe")
+                "flake8"))
+      )
+  #+end_src
+* python anaconda-mode
+  #+begin_src emacs-lisp
+    (use-package anaconda-mode
+      :ensure t
+      :diminish anaconda-mode
+      :defer t
+      :init (progn
+              (add-hook 'python-mode-hook #'anaconda-mode)
+              (add-hook 'python-mode-hook #'anaconda-eldoc-mode)))
+
+    (use-package company-anaconda
+      :ensure t
+      :commands (company-anaconda)
+      :after company
+      :init (add-to-list 'company-backends #'company-anaconda))
+  #+end_src
+* python unit test
+  #+begin_src emacs-lisp
+    (use-package nose
+      :commands (nosetests-one
+                 nosetests-pdb-one
+                 nosetests-all
+                 nosetests-pdb-all
+                 nosetests-module
+                 nosetests-pdb-module
+                 nosetests-suite
+                 nosetests-pdb-suite)
+      :config
+      (progn
+        (add-to-list 'nose-project-root-files "setup.cfg")
+        (setq nose-use-verbose nil)))
+
+    (use-package pytest
+      :commands (pytest-one
+                 pytest-pdb-one
+                 pytest-all
+                 pytest-pdb-all
+                 pytest-module
+                 pytest-pdb-module)
+      :config (add-to-list 'pytest-project-root-files "setup.cfg"))
+  #+end_src
+
+  #+RESULTS:
+* python jedi
+  #+begin_src emacs-lisp
+    (use-package jedi
+      :ensure t
+      :init
+      (add-hook 'python-mode-hook 'jedi:setup)
+      (add-hook 'python-mode-hook 'jedi:ac-setup))
+  #+end_src
+* turn off beep sound
+  #+begin_src emacs-lisp
+    (setq visible-bell 1)
   #+end_src
