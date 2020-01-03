@@ -85,29 +85,33 @@
     (add-to-list 'org-babel-tangle-lang-exts '("js" . "js"))
 
     (setq org-publish-project-alist
-          '(("org keyll publish"
-             ;; Path to org files.
-             :base-directory "~/hoisharka.github.io/_org"
-             :base-extension "org"
+	  '(("org keyll publish"
+	     ;; Path to org files.
+	     :base-directory "~/hoisharka.github.io/_org"
+	     :base-extension "org"
 
-             ;; Path to Jekyll Posts
-             :publishing-directory "~/hoisharka.github.io/_posts/"
-             :recursive t
-             :publishing-function org-html-publish-to-html
-             :headline-levels 4
-             :html-extension "html"
-             :body-only t
-             )))
+	     ;; Path to Jekyll Posts
+	     :publishing-directory "~/hoisharka.github.io/_posts/"
+	     :recursive t
+	     :publishing-function org-html-publish-to-html
+	     :headline-levels 4
+	     :html-extension "html"
+	     :body-only t
+	     )))
 
     (defvar my-org-dir "~/org")
     (defvar my-org-publish-dir "~/git/public")
-    (setq org-directory my-org-dir
-          org-babel-default-header-args
-          (cons '(:noweb . "yes")
-                (assq-delete-all :noweb org-babel-default-header-args))
-          org-babel-default-header-args
-          (cons '(:results . "output verbatim replace")
-                (assq-delete-all :results org-babel-default-header-args))))
+    ;; (setq org-directory my-org-dir
+    ;; 	org-babel-default-header-args
+    ;; 	(cons '(:noweb . "yes")
+    ;; 	      (assq-delete-all :noweb org-babel-default-header-args))
+    ;; 	org-babel-default-header-args
+    ;; 	(cons '(:results . "output verbatim replace")
+    ;; 	      (assq-delete-all :results org-babel-default-header-args))
+    ;; 	)
+    ;; )
+    )
+
 
   (use-package org-bullets
     :ensure t
@@ -725,3 +729,8 @@
 
 
 
+* org-textile
+  #+begin_src emacs-lisp
+    (add-to-list 'load-path "~/.emacs.d/custom/org-textile/")
+    (require 'ox-textile)
+  #+end_src
