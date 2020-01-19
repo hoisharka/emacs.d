@@ -664,9 +664,7 @@
 
 * delete region
   #+begin_src elisp
-    (bind-keys
-     :map global-map
-     ("C-x C-k" . delete-region))
+    (global-set-key (kbd "C-x C-k") delete-region)
   #+end_src
 
 * duplicate line
@@ -819,3 +817,11 @@
   #+begin_src emacs-lisp
     (setq visible-bell 1)
   #+end_src
+* Reveal.js
+  #+begin_src emacs-lisp
+    (use-package ox-reveal
+      :ensure ox-reveal)
+    (setq org-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js" )
+    (setq org-reveal-mathjax t)
+  #+end_src
+  

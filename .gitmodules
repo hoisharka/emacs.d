@@ -1,0 +1,3 @@
+[submodule "custom/org-textile"]
+	path = custom/org-textile
+	url = https://github.com/yashi/org-textile.git
