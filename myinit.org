@@ -52,6 +52,11 @@
       :ensure t)
     (yas-reload-all))
 #+END_SRC
+* php-mode
+  #+begin_src emacs-lisp
+    (use-package php-mode
+      :ensure t)
+  #+end_src
 * org-mode
 #+BEGIN_SRC emacs-lisp
   (use-package org
@@ -80,6 +85,7 @@
        (dot . t)
        (org . t)
        (latex . t)
+       (php . t)
        ))
     (add-to-list 'exec-path (getenv "PATH"))
     (add-to-list 'org-babel-tangle-lang-exts '("js" . "js"))
@@ -662,7 +668,7 @@
 
 * delete region
   #+begin_src elisp
-    (global-set-key (kbd "C-x C-k") delete-region)
+    (global-set-key (kbd "C-S-K") delete-region)
   #+end_src
 
 * duplicate line
@@ -833,6 +839,7 @@
        (setq-default indent-tabs-mode nil)
 
        :config
+
        (setq python-indent-offset 4)
        ;; TODO pyvenv
        (setq flycheck-python-pycompile-executable
