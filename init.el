@@ -34,7 +34,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (yaml-mode yml shell-pop beacon git-timemachine git-gutter magit cider-hydra paredit ace-window adaptive-wrap ov counsel yasnippet-snippets which-key web-mode use-package try org-plus-contrib org-bullets org multiple-cursors material-theme markdown-mode leuven-theme js2-mode htmlize google-translate flycheck elpy dracula-theme better-defaults))))
+    (emmet-mode js2-refactor ac-js2 yaml-mode yml shell-pop beacon git-timemachine git-gutter magit cider-hydra paredit ace-window adaptive-wrap ov counsel yasnippet-snippets which-key web-mode use-package try org-plus-contrib org-bullets org multiple-cursors material-theme markdown-mode leuven-theme js2-mode htmlize google-translate flycheck elpy dracula-theme better-defaults))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
