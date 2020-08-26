@@ -241,7 +241,7 @@
   (setq python-shell-completion-native-disabled-interpreters '("python"))
   (setq elpy-rpc-python-command "python3")
 #+END_SRC
-=======
+
 * COMMENT check os
   #+begin_src emacs-lisp
     ;; check OS type
