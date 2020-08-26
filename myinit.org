@@ -256,7 +256,7 @@
       (progn
 	(message "Linux"))))
   #+end_src
->>>>>>> d935535e0aea7584ed260650a84f69445678f168
+
 * multiple-cursor
 #+BEGIN_SRC emacs-lisp
     (use-package multiple-cursors
@@ -906,5 +906,3 @@
        :ensure t)
 
   #+END_SRC
-
->>>>>>> d935535e0aea7584ed260650a84f69445678f168
