@@ -768,8 +768,11 @@
 
 * org-textile
   #+begin_src emacs-lisp
-    (add-to-list 'load-path "~/.emacs.d/custom/org-textile/")
-    (require 'ox-textile)
+    (use-package ox-textile
+      :ensure t)
+
+    ;; (add-to-list 'load-path "~/.emacs.d/custom/org-textile/")
+    ;; (require 'ox-textile)
   #+end_src
 
 * COMMENT python anaconda
