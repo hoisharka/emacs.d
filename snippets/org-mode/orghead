@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: orghead
+# key: orghead
+# --
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/setup/theme-readtheorg.setup
+#+OPTIONS: ^:nil
+#+MACRO: imglnk @@html:<a href="\$1"><img src="\$2"></a>@@
+#+TITLE: $0

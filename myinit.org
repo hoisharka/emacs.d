@@ -52,6 +52,11 @@
       :ensure t)
     (yas-reload-all))
 #+END_SRC
+* php-mode
+  #+begin_src emacs-lisp
+    (use-package php-mode
+      :ensure t)
+  #+end_src
 * org-mode
 #+BEGIN_SRC emacs-lisp
   (use-package org
@@ -80,34 +85,39 @@
        (dot . t)
        (org . t)
        (latex . t)
+       (php . t)
        ))
     (add-to-list 'exec-path (getenv "PATH"))
     (add-to-list 'org-babel-tangle-lang-exts '("js" . "js"))
 
     (setq org-publish-project-alist
-          '(("org keyll publish"
-             ;; Path to org files.
-             :base-directory "~/hoisharka.github.io/_org"
-             :base-extension "org"
+	  '(("org keyll publish"
+	     ;; Path to org files.
+	     :base-directory "~/hoisharka.github.io/_org"
+	     :base-extension "org"
 
-             ;; Path to Jekyll Posts
-             :publishing-directory "~/hoisharka.github.io/_posts/"
-             :recursive t
-             :publishing-function org-html-publish-to-html
-             :headline-levels 4
-             :html-extension "html"
-             :body-only t
-             )))
+	     ;; Path to Jekyll Posts
+	     :publishing-directory "~/hoisharka.github.io/_posts/"
+	     :recursive t
+	     :publishing-function org-html-publish-to-html
+	     :headline-levels 4
+	     :html-extension "html"
+	     :body-only t
+	     )))
 
     (defvar my-org-dir "~/org")
     (defvar my-org-publish-dir "~/git/public")
-    (setq org-directory my-org-dir
-          org-babel-default-header-args
-          (cons '(:noweb . "yes")
-                (assq-delete-all :noweb org-babel-default-header-args))
-          org-babel-default-header-args
-          (cons '(:results . "output verbatim replace")
-                (assq-delete-all :results org-babel-default-header-args))))
+    ;; (setq org-directory my-org-dir
+    ;; 	org-babel-default-header-args
+    ;; 	(cons '(:noweb . "yes")
+    ;; 	      (assq-delete-all :noweb org-babel-default-header-args))
+    ;; 	org-babel-default-header-args
+    ;; 	(cons '(:results . "output verbatim replace")
+    ;; 	      (assq-delete-all :results org-babel-default-header-args))
+    ;; 	)
+    ;; )
+    )
+
 
   (use-package org-bullets
     :ensure t
@@ -214,6 +224,7 @@
     ;; (add-hook 'org-mode-hook #'ob-clojure-literate-mode)
     (define-key org-babel-map (kbd "M-c") 'ob-clojure-literate-mode)
   #+end_src
+
 * python
 #+BEGIN_SRC emacs-lisp
   ;; (use-package elpy
@@ -230,6 +241,22 @@
   (setq python-shell-completion-native-disabled-interpreters '("python"))
   (setq elpy-rpc-python-command "python3")
 #+END_SRC
+=======
+* COMMENT check os
+  #+begin_src emacs-lisp
+    ;; check OS type
+    (cond
+     ((string-equal system-type "windows-nt") ; Microsoft Windows
+      (progn
+	(message "Microsoft Windows")))
+     ((string-equal system-type "darwin") ; Mac OS X
+      (progn
+	(message "Mac OS X")))
+     ((string-equal system-type "gnu/linux") ; linux
+      (progn
+	(message "Linux"))))
+  #+end_src
+>>>>>>> d935535e0aea7584ed260650a84f69445678f168
 * multiple-cursor
 #+BEGIN_SRC emacs-lisp
     (use-package multiple-cursors
@@ -249,7 +276,6 @@
     :init
     (global-flycheck-mode t))
 #+END_SRC
-
 * markdown
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
@@ -664,9 +690,7 @@
 
 * delete region
   #+begin_src elisp
-    (bind-keys
-     :map global-map
-     ("C-x C-k" . delete-region))
+    (global-set-key (kbd "C-S-K") delete-region)
   #+end_src
 
 * duplicate line
@@ -725,3 +749,159 @@
       (add-hook 'web-mode-hook #'emmet-mode)
       (add-hook 'html-mode-hook #'emmet-mode))
   #+end_src
+
+* COMMENT command to control
+  #+begin_src emacs-lisp
+    (setq mac-command-modifier nil)
+  #+end_src
+* mac setting
+  https://drypot.wordpress.com/2019/02/14/emacs-2주-삽질기/
+  #+begin_src emacs-lisp
+    (when (eq system-type 'darwin)
+     (setq default-input-method "korean-hangul")
+     (global-set-key (kbd "<f17>") 'toggle-input-method)
+     (setq mac-command-modifier 'control)
+     (setq mac-command-modifier 'control)
+    )
+  #+end_src
+
+
+* org-textile
+  #+begin_src emacs-lisp
+    (add-to-list 'load-path "~/.emacs.d/custom/org-textile/")
+    (require 'ox-textile)
+  #+end_src
+
+* COMMENT python anaconda
+  #+begin_src emacs-lisp
+    (use-package python
+      :mode ("\\.py\\'" . python-mode)
+      ("\\.wsgi$" . python-mode)
+      :interpreter ("python" . python-mode)
+
+      :init
+      (setq-default indent-tabs-mode nil)
+
+      :config
+      (setq python-indent-offset 4)
+      ;; TODO pyvenv
+      (setq flycheck-python-pycompile-executable
+            (or (executable-find "python")
+                (executable-find "C:/Anaconda3/python.exe")
+                "python"))
+
+      (setq flycheck-python-pylint-executable
+            (or (executable-find "pylint")
+                (executable-find "C:/Anaconda3/Scripts/pylint.exe")
+                "pylint"))
+      (setq flycheck-python-flake8-executable
+            (or (executable-find "flake8")
+                (executable-find "C:/Anaconda3/envs/python3.7/Scripts/flake8.exe")
+                "flake8"))
+      )
+  #+end_src
+* COMMENT python anaconda-mode
+  #+begin_src emacs-lisp
+    (use-package anaconda-mode
+      :ensure t
+      :diminish anaconda-mode
+      :defer t
+      :init (progn
+              (add-hook 'python-mode-hook #'anaconda-mode)
+              (add-hook 'python-mode-hook #'anaconda-eldoc-mode)))
+
+    (use-package company-anaconda
+      :ensure t
+      :commands (company-anaconda)
+      :after company
+      :init (add-to-list 'company-backends #'company-anaconda))
+  #+end_src
+* COMMENT python unit test
+  #+begin_src emacs-lisp
+    (use-package nose
+      :commands (nosetests-one
+                 nosetests-pdb-one
+                 nosetests-all
+                 nosetests-pdb-all
+                 nosetests-module
+                 nosetests-pdb-module
+                 nosetests-suite
+                 nosetests-pdb-suite)
+      :config
+      (progn
+        (add-to-list 'nose-project-root-files "setup.cfg")
+        (setq nose-use-verbose nil)))
+
+    (use-package pytest
+      :commands (pytest-one
+                 pytest-pdb-one
+                 pytest-all
+                 pytest-pdb-all
+                 pytest-module
+                 pytest-pdb-module)
+      :config (add-to-list 'pytest-project-root-files "setup.cfg"))
+  #+end_src
+
+  #+RESULTS:
+* COMMENT python jedi
+  #+begin_src emacs-lisp
+    (use-package jedi
+      :ensure t
+      :init
+      (add-hook 'python-mode-hook 'jedi:setup)
+      (add-hook 'python-mode-hook 'jedi:ac-setup))
+  #+end_src
+* turn off beep sound
+  #+begin_src emacs-lisp
+    (setq visible-bell 1)
+  #+end_src
+
+* Reveal.js
+  #+begin_src emacs-lisp
+    (use-package ox-reveal
+      :ensure ox-reveal)
+    (setq org-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js" )
+    (setq org-reveal-mathjax t)
+  #+end_src
+  
+* python
+  #+BEGIN_SRC emacs-lisp
+    (use-package python
+       :mode ("\\.py\\'" . python-mode)
+       ("\\.wsgi$" . python-mode)
+       :interpreter ("python" . python-mode)
+
+       :init
+       (setq-default indent-tabs-mode nil)
+
+       :config
+
+       (setq python-indent-offset 4)
+       ;; TODO pyvenv
+       (setq flycheck-python-pycompile-executable
+	     (executable-find "python"))
+
+       (setq flycheck-python-pylint-executable
+	     (executable-find "pylint"))
+   
+       (setq flycheck-python-flake8-executable
+	     (executable-find "flake8")))
+
+     (use-package elpy
+       :ensure t
+       :init
+       (elpy-enable)
+       (setq elpy-modules (delq 'elpy-module-flymake elpy-modules)))
+
+     ;; Enable autopep8
+     (use-package py-autopep8
+       :ensure t
+       :init
+       (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save))
+
+     (use-package blacken
+       :ensure t)
+
+  #+END_SRC
+
+>>>>>>> d935535e0aea7584ed260650a84f69445678f168
