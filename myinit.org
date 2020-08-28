@@ -57,7 +57,52 @@
     (use-package php-mode
       :ensure t)
   #+end_src
+* python
+  #+BEGIN_SRC emacs-lisp
+    (use-package python
+      :mode ("\\.py\\'" . python-mode)
+      ("\\.wsgi$" . python-mode)
+      :interpreter ("python" . python-mode)
 
+      :init
+      (setq-default indent-tabs-mode nil)
+
+      :config
+
+      (setq python-indent-offset 4)
+      ;; TODO pyvenv
+      (setq flycheck-python-pycompile-executable
+            (executable-find "python3"))
+
+      (setq flycheck-python-pylint-executable
+            (executable-find "pylint"))
+
+      (setq flycheck-python-flake8-executable
+            (executable-find "flake8")))
+
+    (use-package elpy
+      :ensure t
+      :init
+      (elpy-enable)
+      (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+      (add-hook 'elpy-mode-hook 'flycheck-mode)
+      (setq python-shell-interpreter "/usr/bin/python3")
+      (setq python-shell-completion-native-disabled-interpreters '("python"))
+      (setq elpy-rpc-python-command "python3"))
+
+    ;; Enable autopep8
+    (use-package py-autopep8
+      :ensure t
+      :init
+      (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
+      (add-hook 'python-mode-hook 'py-autopep8-enable-on-save))
+
+    (use-package blacken
+      :ensure t)
+
+    (use-package ob-ipython
+      :ensure t)
+  #+END_SRC
 * org-mode
 #+BEGIN_SRC emacs-lisp
   (use-package org
@@ -858,50 +903,6 @@
     (setq org-reveal-mathjax t)
   #+end_src
   
-* python
-  #+BEGIN_SRC emacs-lisp
-      (use-package python
-         :mode ("\\.py\\'" . python-mode)
-         ("\\.wsgi$" . python-mode)
-         :interpreter ("python" . python-mode)
-
-         :init
-         (setq-default indent-tabs-mode nil)
-
-         :config
-
-         (setq python-indent-offset 4)
-         ;; TODO pyvenv
-         (setq flycheck-python-pycompile-executable
-               (executable-find "python3"))
-
-         (setq flycheck-python-pylint-executable
-               (executable-find "pylint"))
-
-         (setq flycheck-python-flake8-executable
-               (executable-find "flake8")))
-
-       (use-package elpy
-         :ensure t
-         :init
-         (elpy-enable)
-         (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-         (add-hook 'elpy-mode-hook 'flycheck-mode)
-         (setq python-shell-interpreter "/usr/bin/python3")
-         (setq python-shell-completion-native-disabled-interpreters '("python"))
-         (setq elpy-rpc-python-command "python3"))
-
-       ;; Enable autopep8
-       (use-package py-autopep8
-         :ensure t
-         :init
-         (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
-         (add-hook 'python-mode-hook 'py-autopep8-enable-on-save))
-
-       (use-package blacken
-         :ensure t)
-
-  #+END_SRC
 * ob-sync
   #+begin_src emacs-lisp
     (use-package ob-async
