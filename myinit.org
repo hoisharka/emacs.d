@@ -57,6 +57,7 @@
     (use-package php-mode
       :ensure t)
   #+end_src
+
 * org-mode
 #+BEGIN_SRC emacs-lisp
   (use-package org
@@ -86,24 +87,31 @@
        (org . t)
        (latex . t)
        (php . t)
+       (ipython . t)
        ))
     (add-to-list 'exec-path (getenv "PATH"))
     (add-to-list 'org-babel-tangle-lang-exts '("js" . "js"))
-
+    ;; Syntax highlight in #+BEGIN_SRC blocks
+    (setq org-src-fontify-natively t)
+    ;; Don't prompt before running code in org
+    (setq org-confirm-babel-evaluate nil)
+    ;; Fix an incompatibility between the ob-async and ob-ipython packages
+    (setq ob-async-no-async-languages-alist '("ipython"))
+  
     (setq org-publish-project-alist
-	  '(("org keyll publish"
-	     ;; Path to org files.
-	     :base-directory "~/hoisharka.github.io/_org"
-	     :base-extension "org"
+          '(("org keyll publish"
+             ;; Path to org files.
+             :base-directory "~/hoisharka.github.io/_org"
+             :base-extension "org"
 
-	     ;; Path to Jekyll Posts
-	     :publishing-directory "~/hoisharka.github.io/_posts/"
-	     :recursive t
-	     :publishing-function org-html-publish-to-html
-	     :headline-levels 4
-	     :html-extension "html"
-	     :body-only t
-	     )))
+             ;; Path to Jekyll Posts
+             :publishing-directory "~/hoisharka.github.io/_posts/"
+             :recursive t
+             :publishing-function org-html-publish-to-html
+             :headline-levels 4
+             :html-extension "html"
+             :body-only t
+             )))
 
     (defvar my-org-dir "~/org")
     (defvar my-org-publish-dir "~/git/public")
@@ -224,23 +232,6 @@
     ;; (add-hook 'org-mode-hook #'ob-clojure-literate-mode)
     (define-key org-babel-map (kbd "M-c") 'ob-clojure-literate-mode)
   #+end_src
-
-* python
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package elpy
-  ;;   :ensure t
-  ;;   :config
-  ;;   (add-hook 'python-mode-hook 'elpy-mode))
-
-  (use-package elpy
-    :ensure t
-    :init
-    (elpy-enable))
-
-  (setq python-shell-interpreter "/usr/bin/python3")
-  (setq python-shell-completion-native-disabled-interpreters '("python"))
-  (setq elpy-rpc-python-command "python3")
-#+END_SRC
 
 * COMMENT check os
   #+begin_src emacs-lisp
@@ -869,40 +860,50 @@
   
 * python
   #+BEGIN_SRC emacs-lisp
-    (use-package python
-       :mode ("\\.py\\'" . python-mode)
-       ("\\.wsgi$" . python-mode)
-       :interpreter ("python" . python-mode)
+      (use-package python
+         :mode ("\\.py\\'" . python-mode)
+         ("\\.wsgi$" . python-mode)
+         :interpreter ("python" . python-mode)
 
-       :init
-       (setq-default indent-tabs-mode nil)
+         :init
+         (setq-default indent-tabs-mode nil)
 
-       :config
+         :config
 
-       (setq python-indent-offset 4)
-       ;; TODO pyvenv
-       (setq flycheck-python-pycompile-executable
-	     (executable-find "python"))
+         (setq python-indent-offset 4)
+         ;; TODO pyvenv
+         (setq flycheck-python-pycompile-executable
+               (executable-find "python3"))
 
-       (setq flycheck-python-pylint-executable
-	     (executable-find "pylint"))
-   
-       (setq flycheck-python-flake8-executable
-	     (executable-find "flake8")))
+         (setq flycheck-python-pylint-executable
+               (executable-find "pylint"))
 
-     (use-package elpy
-       :ensure t
-       :init
-       (elpy-enable)
-       (setq elpy-modules (delq 'elpy-module-flymake elpy-modules)))
+         (setq flycheck-python-flake8-executable
+               (executable-find "flake8")))
 
-     ;; Enable autopep8
-     (use-package py-autopep8
-       :ensure t
-       :init
-       (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save))
+       (use-package elpy
+         :ensure t
+         :init
+         (elpy-enable)
+         (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+         (add-hook 'elpy-mode-hook 'flycheck-mode)
+         (setq python-shell-interpreter "/usr/bin/python3")
+         (setq python-shell-completion-native-disabled-interpreters '("python"))
+         (setq elpy-rpc-python-command "python3"))
 
-     (use-package blacken
-       :ensure t)
+       ;; Enable autopep8
+       (use-package py-autopep8
+         :ensure t
+         :init
+         (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
+         (add-hook 'python-mode-hook 'py-autopep8-enable-on-save))
+
+       (use-package blacken
+         :ensure t)
 
   #+END_SRC
+* ob-sync
+  #+begin_src emacs-lisp
+    (use-package ob-async
+      :ensure t)
+  #+end_src
