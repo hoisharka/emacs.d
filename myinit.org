@@ -102,6 +102,63 @@
 
     (use-package ob-ipython
       :ensure t)
+
+    ;; (use-package ein
+    ;;   :defer t
+    ;;   :commands ein:notebooklist-open
+    ;;   :init
+    ;;   (progn
+    ;;     (with-eval-after-load 'ein-notebooklist
+    ;;       ;; removing keybindings
+    ;;       (define-key ein:notebook-mode-map (kbd "M-p") nil)
+    ;;       (define-key ein:notebook-mode-map (kbd "<M-up>") nil)
+    ;;       (define-key ein:notebook-mode-map (kbd "<M-down>") nil)
+    ;;       ;; changing keybinding
+    ;;       (define-key ein:notebook-mode-map (kbd "C-s") 'ein:notebook-save-notebook-command)
+    ;;       (define-key ein:notebook-mode-map (kbd "<M-S-up>") 'ein:worksheet-move-cell-up)
+    ;;       (define-key ein:notebook-mode-map (kbd "<M-S-down>") 'ein:worksheet-move-cell-down))))
+
+
+    (use-package ein
+      :ensure t
+      :init
+      (progn
+        (require 'ein-notebook)
+        ;; (require 'ein-subpackages)
+
+        ;; fix smartparens not wanting to write closing parenthises when highlighting a region
+        (defun insert-open-parens-or-wrap (&optional arg)
+          (interactive "P")
+          (if (region-active-p)
+              (insert-parentheses arg)
+            (insert "()")
+            (backward-char))
+          )
+
+        (defun setup-key-hack ()
+          (define-key ein:notebook-mode-map (kbd "(") #'insert-open-parens-or-wrap))
+
+        (add-hook 'ein:notebooklist-mode-hook #'setup-key-hack)
+        )
+      )
+
+
+    (when (executable-find "ipython")
+      (setq python-shell-interpreter "ipython"))
+
+    ; kill extraneous content in ipython returns between top-level JSON objects
+    (advice-add 'ob-ipython--collect-json :before
+                (lambda (&rest args)
+                  (let ((start (point)))
+                    (set-mark (point))
+                    (while (re-search-forward "{" nil t)
+                      (backward-char)
+                      (kill-region (region-beginning) (region-end))
+                      (re-search-forward "}\n" nil t)
+                      (set-mark (point)))
+                    (end-of-buffer)
+                    (kill-region (region-beginning) (region-end))
+                    (goto-char start))))
   #+END_SRC
 * org-mode
 #+BEGIN_SRC emacs-lisp
@@ -142,7 +199,7 @@
     (setq org-confirm-babel-evaluate nil)
     ;; Fix an incompatibility between the ob-async and ob-ipython packages
     (setq ob-async-no-async-languages-alist '("ipython"))
-  
+
     (setq org-publish-project-alist
           '(("org keyll publish"
              ;; Path to org files.
