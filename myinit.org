@@ -57,38 +57,27 @@
     (use-package php-mode
       :ensure t)
   #+end_src
-* python
-  #+BEGIN_SRC emacs-lisp
-    (use-package python
-      :mode ("\\.py\\'" . python-mode)
-      ("\\.wsgi$" . python-mode)
-      :interpreter ("python" . python-mode)
-
-      :init
-      (setq-default indent-tabs-mode nil)
-
-      :config
-
-      (setq python-indent-offset 4)
-      ;; TODO pyvenv
-      (setq flycheck-python-pycompile-executable
-            (executable-find "python3"))
-
-      (setq flycheck-python-pylint-executable
-            (executable-find "pylint"))
-
-      (setq flycheck-python-flake8-executable
-            (executable-find "flake8")))
-
-    (use-package elpy
+* flycheck
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :init
+    (global-flycheck-mode t))
+#+END_SRC
+* python jedi
+  #+begin_src emacs-lisp
+    (use-package jedi
       :ensure t
       :init
-      (elpy-enable)
-      (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-      (add-hook 'elpy-mode-hook 'flycheck-mode)
-      (setq python-shell-interpreter "/usr/bin/python3")
-      (setq python-shell-completion-native-disabled-interpreters '("python"))
-      (setq elpy-rpc-python-command "python3"))
+      (add-hook 'python-mode-hook 'jedi:setup)
+      (add-hook 'python-mode-hook 'jedi:ac-setup))
+  #+end_src
+* python
+  #+BEGIN_SRC emacs-lisp
+    (use-package elpy
+      :ensure t
+      :config
+      (elpy-enable))
 
     ;; Enable autopep8
     (use-package py-autopep8
@@ -123,23 +112,23 @@
       :ensure t
       :init
       (progn
-        (require 'ein-notebook)
-        ;; (require 'ein-subpackages)
+	(require 'ein-notebook)
+	;; (require 'ein-subpackages)
 
-        ;; fix smartparens not wanting to write closing parenthises when highlighting a region
-        (defun insert-open-parens-or-wrap (&optional arg)
-          (interactive "P")
-          (if (region-active-p)
-              (insert-parentheses arg)
-            (insert "()")
-            (backward-char))
-          )
+	;; fix smartparens not wanting to write closing parenthises when highlighting a region
+	(defun insert-open-parens-or-wrap (&optional arg)
+	  (interactive "P")
+	  (if (region-active-p)
+	      (insert-parentheses arg)
+	    (insert "()")
+	    (backward-char))
+	  )
 
-        (defun setup-key-hack ()
-          (define-key ein:notebook-mode-map (kbd "(") #'insert-open-parens-or-wrap))
+	(defun setup-key-hack ()
+	  (define-key ein:notebook-mode-map (kbd "(") #'insert-open-parens-or-wrap))
 
-        (add-hook 'ein:notebooklist-mode-hook #'setup-key-hack)
-        )
+	(add-hook 'ein:notebooklist-mode-hook #'setup-key-hack)
+	)
       )
 
 
@@ -148,17 +137,17 @@
 
     ; kill extraneous content in ipython returns between top-level JSON objects
     (advice-add 'ob-ipython--collect-json :before
-                (lambda (&rest args)
-                  (let ((start (point)))
-                    (set-mark (point))
-                    (while (re-search-forward "{" nil t)
-                      (backward-char)
-                      (kill-region (region-beginning) (region-end))
-                      (re-search-forward "}\n" nil t)
-                      (set-mark (point)))
-                    (end-of-buffer)
-                    (kill-region (region-beginning) (region-end))
-                    (goto-char start))))
+		(lambda (&rest args)
+		  (let ((start (point)))
+		    (set-mark (point))
+		    (while (re-search-forward "{" nil t)
+		      (backward-char)
+		      (kill-region (region-beginning) (region-end))
+		      (re-search-forward "}\n" nil t)
+		      (set-mark (point)))
+		    (end-of-buffer)
+		    (kill-region (region-beginning) (region-end))
+		    (goto-char start))))
   #+END_SRC
 * org-mode
 #+BEGIN_SRC emacs-lisp
@@ -361,13 +350,6 @@
 	(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 	(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 	(global-set-key (kbd "C-c m c") 'mc/edit-lines)))
-#+END_SRC
-* flycheck
-#+BEGIN_SRC emacs-lisp
-  (use-package flycheck
-    :ensure t
-    :init
-    (global-flycheck-mode t))
 #+END_SRC
 * markdown
 #+BEGIN_SRC emacs-lisp
@@ -783,7 +765,7 @@
 
 * delete region
   #+begin_src elisp
-    (global-set-key (kbd "C-S-K") delete-region)
+    (global-set-key (kbd "C-S-K") 'delete-region)
   #+end_src
 
 * duplicate line
@@ -939,14 +921,6 @@
   #+end_src
 
   #+RESULTS:
-* COMMENT python jedi
-  #+begin_src emacs-lisp
-    (use-package jedi
-      :ensure t
-      :init
-      (add-hook 'python-mode-hook 'jedi:setup)
-      (add-hook 'python-mode-hook 'jedi:ac-setup))
-  #+end_src
 * turn off beep sound
   #+begin_src emacs-lisp
     (setq visible-bell 1)
