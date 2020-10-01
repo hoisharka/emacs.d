@@ -14,7 +14,14 @@
     (desktop-save-mode 1))
 
   (global-set-key (kbd "C-M-q") 'visual-line-mode)
+  (prefer-coding-system 'utf-8)
+  (set-default-coding-systems 'utf-8)
+  (set-language-environment 'utf-8)
+  (set-selection-coding-system 'utf-8)
 
+  ;; 한글 입력관련
+  (setq default-input-method "korean-hangul")
+  (global-set-key (kbd "S-SPC") 'toggle-input-method)
 #+END_SRC
 
 * try
@@ -443,6 +450,8 @@
       (global-set-key (kbd "C-c k") 'counsel-ag)
       (global-set-key (kbd "C-x l") 'counsel-locate)
       (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
+      (ivy-define-key ivy-minibuffer-map (kbd "S-SPC") nil)
+      (ivy-define-key ivy-minibuffer-map (kbd "C-SPC") 'ivy-restrict-to-matches)
       (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
       ))
 #+END_SRC
