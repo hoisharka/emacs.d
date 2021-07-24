@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: hugo-header
+# key: hugo-header
+# --
+#+title: $1
+#+author: $2
+#+lastmod: 2021-07-24
+#+categories[]: $3
+#+draft: true
