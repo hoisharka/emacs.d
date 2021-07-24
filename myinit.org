@@ -1,6 +1,9 @@
 #+STARTUP: overview 
 #+PROPERTY: header-args :comments yes :results silent
-
+* custom add emacs files
+  #+begin_src emacs-lisp
+    (add-to-list 'load-path "~/.emacs.d/custom/")
+  #+end_src
 * interface tweaks
 #+BEGIN_SRC emacs-lisp
   (setq inhibit-startup-message t)
@@ -947,4 +950,31 @@
   #+begin_src emacs-lisp
     (use-package ob-async
       :ensure t)
+  #+end_src
+
+* update files with last modifed date
+  #+begin_src emacs-lisp
+    ;; Update files with last modifed date
+    (setq time-stamp-active t
+	  time-stamp-start "#\\+lastmod:[ \t]*"
+	  time-stamp-end "$"
+	  time-stamp-format "%04Y-%02m-%02d")
+    (add-hook 'before-save-hook 'time-stamp nil)
+  #+end_src
+* set temp file dir
+  #+begin_src emacs-lisp
+    (setq backup-directory-alist
+	      `((".*" . ,temporary-file-directory)))
+	(setq auto-save-file-name-transforms
+	      `((".*" ,temporary-file-directory t)))
+  #+end_src
+
+* COMMENT mozrepl
+  #+begin_src emacs-lisp
+    (autoload 'moz-minor-mode "moz" "Mozilla Minor and Inferior Mozilla Modes" t)
+
+    (add-hook 'javascript-mode-hook 'javascript-custom-setup)
+    (add-hook 'org-mode-hook 'javascript-custom-setup)
+    (defun javascript-custom-setup ()
+      (moz-minor-mode 1))
   #+end_src
