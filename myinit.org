@@ -963,12 +963,16 @@
   #+end_src
 * set temp file dir
   #+begin_src emacs-lisp
+    ;; disable auto-save and auto-backup
+    (setq create-lockfiles nil)
+    ;; (setq auto-save-default nil)
+    ;; (setq make-backup-files nil)
     (setq backup-directory-alist
-	      `((".*" . ,temporary-file-directory)))
-	(setq auto-save-file-name-transforms
-	      `((".*" ,temporary-file-directory t)))
+	  `((".*" . ,temporary-file-directory)))
+    (setq auto-save-file-name-transforms
+	  `((".*" ,temporary-file-directory t)))
   #+end_src
-
+  
 * COMMENT mozrepl
   #+begin_src emacs-lisp
     (autoload 'moz-minor-mode "moz" "Mozilla Minor and Inferior Mozilla Modes" t)
@@ -977,4 +981,29 @@
     (add-hook 'org-mode-hook 'javascript-custom-setup)
     (defun javascript-custom-setup ()
       (moz-minor-mode 1))
+  #+end_src
+
+
+* indium
+  #+begin_src emacs-lisp
+    ;; for javascript repl
+    (unless (package-installed-p 'indium)
+      (package-install 'indium))
+  #+end_src
+  
+* js-comint
+  #+begin_src emacs-lisp
+    (use-package js-comint
+      :ensure t)
+  #+end_src
+* slime
+  #+begin_src emacs-lisp
+    (use-package slime
+      :ensure t)
+    (require 'setup-slime-js)
+
+    (global-set-key [f5] 'slime-js-reload)
+    (add-hook 'js2-mode-hook
+	      (lambda ()
+		(slime-js-minor-mode 1)))
   #+end_src

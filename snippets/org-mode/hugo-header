@@ -4,6 +4,7 @@
 # --
 #+title: $1
 #+author: $2
-#+lastmod: 2021-07-24
-#+categories[]: $3
+#+lastmod: 2021-07-25
+#+categories[]: development
+#+tags[]: $3
 #+draft: true
