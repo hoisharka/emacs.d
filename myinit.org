@@ -159,6 +159,14 @@
 		    (kill-region (region-beginning) (region-end))
 		    (goto-char start))))
   #+END_SRC
+* vue-mode
+  #+begin_src emacs-lisp
+    (use-package vue-mode
+      :ensure t
+      :config (progn 
+                (setq js-indent-level 2)
+                ))
+  #+end_src
 * org-mode
 #+BEGIN_SRC emacs-lisp
   (use-package org
