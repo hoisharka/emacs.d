@@ -199,7 +199,7 @@
        (ipython . t)
        ))
     (add-to-list 'exec-path (getenv "PATH"))
-    (add-to-list 'org-babel-tangle-lang-exts '("js" . "js"))
+    (add-to-list 'org-babel-tangle-lang-exts '("js" . "js2"))
     ;; Syntax highlight in #+BEGIN_SRC blocks
     (setq org-src-fontify-natively t)
     ;; Don't prompt before running code in org
@@ -441,7 +441,7 @@
     )
 
   (use-package swiper
-    :ensure try
+    :ensure t
     :config
     (progn
       (ivy-mode 1)
@@ -461,8 +461,8 @@
       (global-set-key (kbd "C-c k") 'counsel-ag)
       (global-set-key (kbd "C-x l") 'counsel-locate)
       (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
-      (ivy-define-key ivy-minibuffer-map (kbd "S-SPC") nil)
-      (ivy-define-key ivy-minibuffer-map (kbd "C-SPC") 'ivy-restrict-to-matches)
+      (define-key ivy-minibuffer-map (kbd "S-SPC") nil)
+      (define-key ivy-minibuffer-map (kbd "C-SPC") 'ivy-restrict-to-matches)
       (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
       ))
 #+END_SRC
@@ -1011,7 +1011,29 @@
     (require 'setup-slime-js)
 
     (global-set-key [f5] 'slime-js-reload)
-    (add-hook 'js2-mode-hook
+    (add-hook 'js2-mode-hookt
 	      (lambda ()
 		(slime-js-minor-mode 1)))
   #+end_src
+* js2-mode
+  #+begin_src emacs-lisp
+    (use-package js2-mode
+      :ensure t)
+  #+end_src
+
+* simple-httpd
+  #+begin_src emacs-lisp
+    (use-package simple-httpd
+      :ensure t)
+  #+end_src
+
+* skewer-mode
+  #+begin_src emacs-lisp
+    (use-package skewer-mode
+      :ensure t)
+    (add-hook 'js2-mode-hook 'skewer-mode)
+    (add-hook 'css-mode-hook 'skewer-css-mode)
+    (add-hook 'html-mode-hook 'skewer-html-mode)
+  #+end_src
+
+
