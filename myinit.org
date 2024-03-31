@@ -1037,3 +1037,30 @@
   #+end_src
 
 
+* korean binding
+  #+begin_src emacs-lisp
+    ;;----------------------------------------------------------------------------
+    ;; Korean binding
+    ;;----------------------------------------------------------------------------
+    ;; 한글 자모와 대응하는 영어 코드 배열 정의
+    (let ((hangul-to-english
+	   '(("ㄱ" . "r") ("ㄴ" . "s") ("ㄷ" . "e") ("ㄹ" . "f")
+	     ("ㅁ" . "a") ("ㅂ" . "q") ("ㅅ" . "t") ("ㅇ" . "d")
+	     ("ㅈ" . "w") ("ㅊ" . "c") ("ㅋ" . "z") ("ㅌ" . "x")
+	     ("ㅍ" . "v") ("ㅎ" . "g") ("ㅏ" . "k") ("ㅐ" . "o")
+	     ("ㅑ" . "i") ("ㅓ" . "j") ("ㅔ" . "p") ("ㅕ" . "u")
+	     ("ㅗ" . "h") ("ㅛ" . "y") ("ㅜ" . "n") ("ㅠ" . "b")
+	     ("ㅡ" . "m") ("ㅣ" . "l")
+	     ;; 추가적인 기본 모음과 자음을 여기에 넣을 수 있습니다
+	     )))
+      (dolist (pair hangul-to-english)
+	(let ((hangul (car pair))
+	      (english (cdr pair)))
+	  ;; Control과 Shift 조합에 대한 키맵 정의
+	  (define-key key-translation-map (kbd (concat "C-" hangul)) (kbd (concat "C-" english)))
+	  (define-key key-translation-map (kbd (concat "s-" hangul)) (kbd (concat "s-" english)))
+	  (define-key key-translation-map (kbd (concat "M-" hangul)) (kbd (concat "M-" english)))
+	  ;; 여기에 추가적인 키 조합을 넣을 수 있습니다
+	  )))
+
+  #+end_src
