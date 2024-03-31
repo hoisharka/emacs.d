@@ -829,7 +829,7 @@
   #+end_src
 * linum
   #+begin_src emacs-lisp
-    (global-linum-mode t)
+    (display-line-numbers-mode 1)
   #+end_src
 * browse-url-of-file
   #+begin_src emacs-lisp
@@ -844,7 +844,7 @@
       (add-hook 'web-mode-hook #'emmet-mode)
       (add-hook 'html-mode-hook #'emmet-mode))
   #+end_src
-
+  
 * COMMENT command to control
   #+begin_src emacs-lisp
     (setq mac-command-modifier nil)
