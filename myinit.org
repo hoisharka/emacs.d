@@ -1036,7 +1036,6 @@
     (add-hook 'html-mode-hook 'skewer-html-mode)
   #+end_src
 
-
 * korean binding
   #+begin_src emacs-lisp
     ;;----------------------------------------------------------------------------
@@ -1064,3 +1063,16 @@
 	  )))
 
   #+end_src
+
+* org-download
+#+begin_src emacs-lisp
+  (use-package org-download
+    ;; Keybind：Ctrl + Shift + Y
+    :bind ("C-S-y" . org-download-clipboard)
+    :config
+    (require 'org-download)
+    ;; Drag and drop to Dired
+    (add-hook 'dired-mode-hook 'org-download-enable)
+    )
+#+end_src
+
