@@ -1036,7 +1036,7 @@
     (add-hook 'html-mode-hook 'skewer-html-mode)
   #+end_src
 
-* COMMENT korean binding
+* korean binding
   #+begin_src emacs-lisp
     ;;----------------------------------------------------------------------------
     ;; Korean binding
@@ -1075,4 +1075,3 @@
     (add-hook 'dired-mode-hook 'org-download-enable)
     )
 #+end_src
-
