@@ -208,19 +208,19 @@
     (setq ob-async-no-async-languages-alist '("ipython"))
 
     (setq org-publish-project-alist
-          '(("org keyll publish"
-             ;; Path to org files.
-             :base-directory "~/hoisharka.github.io/_org"
-             :base-extension "org"
+	  '(("org keyll publish"
+	     ;; Path to org files.
+	     :base-directory "~/hoisharka.github.io/_org"
+	     :base-extension "org"
 
-             ;; Path to Jekyll Posts
-             :publishing-directory "~/hoisharka.github.io/_posts/"
-             :recursive t
-             :publishing-function org-html-publish-to-html
-             :headline-levels 4
-             :html-extension "html"
-             :body-only t
-             )))
+	     ;; Path to Jekyll Posts
+	     :publishing-directory "~/hoisharka.github.io/_posts/"
+	     :recursive t
+	     :publishing-function org-html-publish-to-html
+	     :headline-levels 4
+	     :html-extension "html"
+	     :body-only t
+	     )))
 
     (defvar my-org-dir "~/org")
     (defvar my-org-publish-dir "~/git/public")
@@ -233,6 +233,8 @@
     ;; 	      (assq-delete-all :results org-babel-default-header-args))
     ;; 	)
     ;; )
+    (with-eval-after-load 'org
+      (define-key org-mode-map (kbd "<f5>") 'org-toggle-inline-images))
     )
 
 
@@ -1075,3 +1077,4 @@
     (add-hook 'dired-mode-hook 'org-download-enable)
     )
 #+end_src
+
