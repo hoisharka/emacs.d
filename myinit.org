@@ -4,27 +4,82 @@
   #+begin_src emacs-lisp
     (add-to-list 'load-path "~/.emacs.d/custom/")
   #+end_src
+* ui
+  #+begin_src emacs-lisp
+  ;; These customizations change the way emacs looks and disable/enable
+  ;; some user interface elements. Some useful customizations are
+  ;; commented out, and begin with the line "CUSTOMIZE". These are more
+  ;; a matter of preference and may require some fiddling to match your
+  ;; preferences
+
+  (tooltip-mode -1)                 ;; disable tooltips
+  (tool-bar-mode -1)                ;; the toolbar is pretty ugly
+  (scroll-bar-mode -1)              ;; disable visible scrollbar
+  (blink-cursor-mode 0)             ;; turn off blinking cursor. distracting!
+  (setq create-lockfiles nil)       ;; no need for ~ files when editing
+  (fset 'yes-or-no-p 'y-or-n-p)     ;; changes all yes/no questions to y/n type
+  (setq inhibit-startup-message t)  ;; go straight to scratch buffer on startup
+  (setq ring-bell-function 'ignore) ;; turn off audible bell
+
+  ;; show full path in title bar
+  (setq-default frame-title-format "%b (%f)")
+
+  ;; initial frame height and width
+  (add-to-list 'default-frame-alist '(height . 45))
+  (add-to-list 'default-frame-alist '(width . 100))
+
+  ;; increase font size for better readability
+  (set-face-attribute 'default nil :height 140)
+
+  ;; on a Mac, don't pop up font menu
+  (when (string-equal system-type "darwin") 'ok
+	(global-set-key (kbd "s-t") '(lambda () (interactive))))
+
+  (use-package doom-themes
+    :ensure t
+    :config
+    (load-theme 'doom-dracula t))
+
+
+  ;; These settings relate to how emacs interacts with your operating system
+  (setq ;; makes killing/yanking interact with the clipboard
+   x-select-enable-clipboard t
+
+   ;; I'm actually not sure what this does but it's recommended?
+   x-select-enable-primary t
+
+   ;; Save clipboard strings into kill ring before replacing them.
+   ;; When one selects something in another program to paste it into Emacs,
+   ;; but kills something in Emacs before actually pasting it,
+   ;; this selection is gone unless this variable is non-nil
+   save-interprogram-paste-before-kill t
+
+   ;; Shows all options when running apropos. For more info,
+   ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Apropos.html
+   apropos-do-all t
+
+   ;; Mouse yank commands yank at point instead of at click.
+   mouse-yank-at-point t)
+
+  #+end_src
 * interface tweaks
 #+BEGIN_SRC emacs-lisp
-  (setq inhibit-startup-message t)
-  (tool-bar-mode -1)
-  (fset 'yes-or-no-p 'y-or-n-p)
-  (global-set-key (kbd "<f5>") 'revert-buffer)
+(global-set-key (kbd "<f5>") 'revert-buffer)
 
-  (use-package desktop
-    :ensure t
-    :init
-    (desktop-save-mode 1))
+(use-package desktop
+  :ensure t
+  :init
+  (desktop-save-mode 1))
 
-  (global-set-key (kbd "C-M-q") 'visual-line-mode)
-  (prefer-coding-system 'utf-8)
-  (set-default-coding-systems 'utf-8)
-  (set-language-environment 'utf-8)
-  (set-selection-coding-system 'utf-8)
+(global-set-key (kbd "C-M-q") 'visual-line-mode)
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-language-environment 'utf-8)
+(set-selection-coding-system 'utf-8)
 
-  ;; 한글 입력관련
-  (setq default-input-method "korean-hangul")
-  (global-set-key (kbd "S-SPC") 'toggle-input-method)
+;; 한글 입력관련
+(setq default-input-method "korean-hangul")
+(global-set-key (kbd "S-SPC") 'toggle-input-method)
 #+END_SRC
 
 * try
@@ -37,8 +92,13 @@
 #+BEGIN_SRC emacs-lisp
 (use-package which-key
   :ensure t
+  :init (which-key-mode)
+  :diminish which-key-mode
   :config
-  (which-key-mode))
+  (setq which-key-idle-delay 0.3)
+  (which-key-setup-side-window-bottom)
+  (which-key-setup-minibuffer)
+  )
 #+END_SRC
 
 * adaptive-wrap
@@ -84,181 +144,185 @@
   #+end_src
 * python
   #+BEGIN_SRC emacs-lisp
-    (use-package elpy
-      :ensure t
-      :config
-      (elpy-enable))
-
-    ;; Enable autopep8
-    (use-package py-autopep8
-      :ensure t
-      :init
-      (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
-      (add-hook 'python-mode-hook 'py-autopep8-enable-on-save))
-
-    (use-package blacken
-      :ensure t)
-
-    (use-package ob-ipython
-      :ensure t)
-
-    ;; (use-package ein
-    ;;   :defer t
-    ;;   :commands ein:notebooklist-open
-    ;;   :init
-    ;;   (progn
-    ;;     (with-eval-after-load 'ein-notebooklist
-    ;;       ;; removing keybindings
-    ;;       (define-key ein:notebook-mode-map (kbd "M-p") nil)
-    ;;       (define-key ein:notebook-mode-map (kbd "<M-up>") nil)
-    ;;       (define-key ein:notebook-mode-map (kbd "<M-down>") nil)
-    ;;       ;; changing keybinding
-    ;;       (define-key ein:notebook-mode-map (kbd "C-s") 'ein:notebook-save-notebook-command)
-    ;;       (define-key ein:notebook-mode-map (kbd "<M-S-up>") 'ein:worksheet-move-cell-up)
-    ;;       (define-key ein:notebook-mode-map (kbd "<M-S-down>") 'ein:worksheet-move-cell-down))))
-
-
-    (use-package ein
-      :ensure t
-      :init
-      (progn
-	(require 'ein-notebook)
-	;; (require 'ein-subpackages)
-
-	;; fix smartparens not wanting to write closing parenthises when highlighting a region
-	(defun insert-open-parens-or-wrap (&optional arg)
-	  (interactive "P")
-	  (if (region-active-p)
-	      (insert-parentheses arg)
-	    (insert "()")
-	    (backward-char))
-	  )
-
-	(defun setup-key-hack ()
-	  (define-key ein:notebook-mode-map (kbd "(") #'insert-open-parens-or-wrap))
-
-	(add-hook 'ein:notebooklist-mode-hook #'setup-key-hack)
-	)
-      )
-
-
-    (when (executable-find "ipython")
-      (setq python-shell-interpreter "ipython"))
-
-    ; kill extraneous content in ipython returns between top-level JSON objects
-    (advice-add 'ob-ipython--collect-json :before
-		(lambda (&rest args)
-		  (let ((start (point)))
-		    (set-mark (point))
-		    (while (re-search-forward "{" nil t)
-		      (backward-char)
-		      (kill-region (region-beginning) (region-end))
-		      (re-search-forward "}\n" nil t)
-		      (set-mark (point)))
-		    (end-of-buffer)
-		    (kill-region (region-beginning) (region-end))
-		    (goto-char start))))
-  #+END_SRC
-* vue-mode
-  #+begin_src emacs-lisp
-    (use-package vue-mode
-      :ensure t
-      :config (progn 
-                (setq js-indent-level 2)
-                ))
-  #+end_src
-* org-mode
-#+BEGIN_SRC emacs-lisp
-  (use-package org
-    :ensure org-plus-contrib
+  (use-package elpy
+    :ensure t
     :config
-    (require 'org-tempo)
-    (require 'ox-confluence)
-    (require 'ob-clojure)
-    (require 'ob-js)
-    (require 'ob-shell)
-    (global-set-key "\C-cl" 'org-store-link)
-    (global-set-key "\C-ca" 'org-agenda)
-    (global-set-key "\C-cc" 'org-capture)
-    (global-set-key "\C-cb" 'org-switchb)
-    ;; (org-defkey org-mode-map "\C-x\C-e" 'cider-eval-last-sexp)
-    ;; (org-defkey org-mode-map "\C-c\C-d" 'cider-doc)
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((python . t)
-       (emacs-lisp . t)
-       (clojure . t)
-       (shell . t)
-       (C . t)
-       (js . t)
-       (ditaa . t)
-       (dot . t)
-       (org . t)
-       (latex . t)
-       (php . t)
-       (ipython . t)
-       ))
-    (add-to-list 'exec-path (getenv "PATH"))
-    (add-to-list 'org-babel-tangle-lang-exts '("js" . "js2"))
-    ;; Syntax highlight in #+BEGIN_SRC blocks
-    (setq org-src-fontify-natively t)
-    ;; Don't prompt before running code in org
-    (setq org-confirm-babel-evaluate nil)
-    ;; Fix an incompatibility between the ob-async and ob-ipython packages
-    (setq ob-async-no-async-languages-alist '("ipython"))
+    (elpy-enable))
 
-    (setq org-publish-project-alist
-          '(("org keyll publish"
-             ;; Path to org files.
-             :base-directory "~/hoisharka.github.io/_org"
-             :base-extension "org"
+  ;; Enable autopep8
+  (use-package py-autopep8
+    :ensure t
+    :init
+    (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
+    (add-hook 'python-mode-hook 'py-autopep8-enable-on-save))
 
-             ;; Path to Jekyll Posts
-             :publishing-directory "~/hoisharka.github.io/_posts/"
-             :recursive t
-             :publishing-function org-html-publish-to-html
-             :headline-levels 4
-             :html-extension "html"
-             :body-only t
-             )))
+  (use-package blacken
+    :ensure t)
 
-    (defvar my-org-dir "~/org")
-    (defvar my-org-publish-dir "~/git/public")
-    ;; (setq org-directory my-org-dir
-    ;; 	org-babel-default-header-args
-    ;; 	(cons '(:noweb . "yes")
-    ;; 	      (assq-delete-all :noweb org-babel-default-header-args))
-    ;; 	org-babel-default-header-args
-    ;; 	(cons '(:results . "output verbatim replace")
-    ;; 	      (assq-delete-all :results org-babel-default-header-args))
-    ;; 	)
-    ;; )
+  (use-package ob-ipython
+    :ensure t)
+
+  ;; (use-package ein
+  ;;   :defer t
+  ;;   :commands ein:notebooklist-open
+  ;;   :init
+  ;;   (progn
+  ;;     (with-eval-after-load 'ein-notebooklist
+  ;;       ;; removing keybindings
+  ;;       (define-key ein:notebook-mode-map (kbd "M-p") nil)
+  ;;       (define-key ein:notebook-mode-map (kbd "<M-up>") nil)
+  ;;       (define-key ein:notebook-mode-map (kbd "<M-down>") nil)
+  ;;       ;; changing keybinding
+  ;;       (define-key ein:notebook-mode-map (kbd "C-s") 'ein:notebook-save-notebook-command)
+  ;;       (define-key ein:notebook-mode-map (kbd "<M-S-up>") 'ein:worksheet-move-cell-up)
+  ;;       (define-key ein:notebook-mode-map (kbd "<M-S-down>") 'ein:worksheet-move-cell-down))))
+
+
+  (use-package ein
+    :ensure t
+    :init
+    (progn
+      (require 'ein-notebook)
+      ;; (require 'ein-subpackages)
+
+      ;; fix smartparens not wanting to write closing parenthises when highlighting a region
+      (defun insert-open-parens-or-wrap (&optional arg)
+	(interactive "P")
+	(if (region-active-p)
+	    (insert-parentheses arg)
+	  (insert "()")
+	  (backward-char))
+	)
+
+      (defun setup-key-hack ()
+	(define-key ein:notebook-mode-map (kbd "(") #'insert-open-parens-or-wrap))
+
+      (add-hook 'ein:notebooklist-mode-hook #'setup-key-hack)
+      )
     )
 
 
-  (use-package org-bullets
-    :ensure t
-    :config
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+  (when (executable-find "ipython")
+    (setq python-shell-interpreter "ipython"))
+
+  ; kill extraneous content in ipython returns between top-level JSON objects
+  (advice-add 'ob-ipython--collect-json :before
+	      (lambda (&rest args)
+		(let ((start (point)))
+		  (set-mark (point))
+		  (while (re-search-forward "{" nil t)
+		    (backward-char)
+		    (kill-region (region-beginning) (region-end))
+		    (re-search-forward "}\n" nil t)
+		    (set-mark (point)))
+		  (end-of-buffer)
+		  (kill-region (region-beginning) (region-end))
+		  (goto-char start))))
+  #+END_SRC
+* vue-mode
+  #+begin_src emacs-lisp
+(use-package vue-mode
+  :ensure t
+  :config (progn 
+            (setq js-indent-level 2)
+            ))
+  #+end_src
+* org-mode
+#+BEGIN_SRC emacs-lisp
+(use-package org
+  :ensure org-plus-contrib
+  :config
+  (require 'org-tempo)
+  (require 'ox-confluence)
+  (require 'ob-clojure)
+  (require 'ob-js)
+  (require 'ob-shell)
+  (global-set-key "\C-cl" 'org-store-link)
+  (global-set-key "\C-ca" 'org-agenda)
+  (global-set-key "\C-cc" 'org-capture)
+  (global-set-key "\C-cb" 'org-switchb)
+  ;; (org-defkey org-mode-map "\C-x\C-e" 'cider-eval-last-sexp)
+  ;; (org-defkey org-mode-map "\C-c\C-d" 'cider-doc)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t)
+     (emacs-lisp . t)
+     (clojure . t)
+     (shell . t)
+     (C . t)
+     (js . t)
+     (ditaa . t)
+     (dot . t)
+     (org . t)
+     (latex . t)
+     (php . t)
+     (ipython . t)
+     ))
+  (add-to-list 'exec-path (getenv "PATH"))
+  (add-to-list 'org-babel-tangle-lang-exts '("js" . "js2"))
+  ;; Syntax highlight in #+BEGIN_SRC blocks
+  (setq org-src-fontify-natively t)
+  ;; Don't prompt before running code in org
+  (setq org-confirm-babel-evaluate nil)
+  ;; Fix an incompatibility between the ob-async and ob-ipython packages
+  (setq ob-async-no-async-languages-alist '("ipython"))
+  (setq org-edit-src-content-indentation 0) ;; 기본값은 0입니다.
+  (setq org-adapt-indentation t)
+  (setq org-publish-project-alist
+	'(("org keyll publish"
+	   ;; Path to org files.
+	   :base-directory "~/hoisharka.github.io/_org"
+	   :base-extension "org"
+
+	   ;; Path to Jekyll Posts
+	   :publishing-directory "~/hoisharka.github.io/_posts/"
+	   :recursive t
+	   :publishing-function org-html-publish-to-html
+	   :headline-levels 4
+	   :html-extension "html"
+	   :body-only t
+	   )))
+  (setq org-src-preserve-indentation t) ;; 기존 들여쓰기 유지
+  (setq org-edit-src-content-indentation 0) ;; Org 모드에서 코드 블럭 들여쓰기 없음
+  (setq org-src-tab-acts-natively t) ;; TAB 키가 코드의 기본 들여쓰기 동작 수행
+  (setq org-src-fontify-natively t) ;; 코드 블럭 하이라이팅 활성화
+  (defvar my-org-dir "~/org")
+  (defvar my-org-publish-dir "~/git/public")
+  ;; (setq org-directory my-org-dir
+  ;; 	org-babel-default-header-args
+  ;; 	(cons '(:noweb . "yes")
+  ;; 	      (assq-delete-all :noweb org-babel-default-header-args))
+  ;; 	org-babel-default-header-args
+  ;; 	(cons '(:results . "output verbatim replace")
+  ;; 	      (assq-delete-all :results org-babel-default-header-args))
+  ;; 	)
+  ;; )
+  )
+
+
+(use-package org-bullets
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 #+END_SRC
 * htmlize
 #+BEGIN_SRC emacs-lisp
-  (use-package htmlize
-    :ensure t
-    :commands (htmlize-buffer
-               htmlize-file
-               htmlize-many-files
-               htmlize-many-files-dired
-               htmlize-region))
+(use-package htmlize
+  :ensure t
+  :commands (htmlize-buffer
+             htmlize-file
+             htmlize-many-files
+             htmlize-many-files-dired
+             htmlize-region))
 #+END_SRC
 * company-mode
   #+begin_src emacs-lisp
-    (use-package company
-      :ensure t
-      :defer t
-      :config (add-hook 'after-init-hook 'global-company-mode)
-      )
+  (use-package company
+    :ensure t
+    :defer t
+    :config (add-hook 'after-init-hook 'global-company-mode)
+    )
   #+end_src
 * clojure-mode
 #+BEGIN_SRC emacs-lisp
@@ -302,28 +366,34 @@
 #+end_src
 * cider
 #+BEGIN_SRC emacs-lisp
-  (use-package cider
-    :ensure t;;cider-hydra
-    :pin melpa-stable
-    :config
-    ;;(add-hook 'cider-repl-mode-hook #'company-mode)
-    ;;(add-hook 'cider-mode-hook #'company-mode)
-    ;;(add-hook 'cider-mode-hook #'eldoc-mode)
-    ;;(add-hook 'cider-mode-hook #'cider-hydra-mode)
-    (add-hook 'clojure-mode-hook #'paredit-mode)
-    (setq cider-repl-use-pretty-printing t)
-    (setq cider-repl-display-help-banner nil)
-    (setq cider-jack-in-default 'lein)
-    (setq org-babel-clojure-backend 'cider)
-    (setq org-babel-clojure-sync-nrepl-timeout nil)
-    ;; (setq cider-inject-dependencies-at-jack-in nil)
-    (setq cider-show-error-buffer nil)
-    (setq cider-cljs-lein-repl "(do (use 'figwheel-sidecar.repl-api) (start-figwheel!) (cljs-repl))")
+(use-package cider
+  :ensure t;;cider-hydra
+  :pin melpa-stable
+  :config
+  ;;(add-hook 'cider-repl-mode-hook #'company-mode)
+  ;;(add-hook 'cider-mode-hook #'company-mode)
+  ;;(add-hook 'cider-mode-hook #'eldoc-mode)
+  ;;(add-hook 'cider-mode-hook #'cider-hydra-mode)
+  (cond
+     ((string-equal system-type "darwin") ; Mac OS X
+      (progn
+	  (add-to-list 'exec-path "/opt/homebrew/bin/lein"))))
+  (add-hook 'clojure-mode-hook #'paredit-mode)
+  (add-to-list 'exec-path "/opt/homebrew/bin/lein")
+  (setq cider-jdk-path "/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home")
+  (setq cider-repl-use-pretty-printing t)
+  (setq cider-repl-display-help-banner nil)
+  (setq cider-jack-in-default 'lein)
+  (setq org-babel-clojure-backend 'cider)
+  (setq org-babel-clojure-sync-nrepl-timeout nil)
+  ;; (setq cider-inject-dependencies-at-jack-in nil)
+  (setq cider-show-error-buffer nil)
+  (setq cider-cljs-lein-repl "(do (use 'figwheel-sidecar.repl-api) (start-figwheel!) (cljs-repl))")
 
-    :bind (("M-r" . cider-ns-refresh)
-	   ("C-c r" . cider-repl-reset)
-	   ("C-c ." . cider-reset-test-run-tests))
-    )
+  :bind (("M-r" . cider-ns-refresh)
+	 ("C-c r" . cider-repl-reset)
+	 ("C-c ." . cider-reset-test-run-tests))
+  )
 #+END_SRC
 * COMMENT ob-clojure-literate
   #+begin_src emacs-lisp
@@ -359,25 +429,25 @@
 
 * multiple-cursor
 #+BEGIN_SRC emacs-lisp
-    (use-package multiple-cursors
-      :ensure t
-      :config
-      (progn
-	(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-	(global-set-key (kbd "C->") 'mc/mark-next-like-this)
-	(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-	(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-	(global-set-key (kbd "C-c m c") 'mc/edit-lines)))
+(use-package multiple-cursors
+  :ensure t
+  :config
+  (progn
+    (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+    (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+    (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+    (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+    (global-set-key (kbd "C-c m c") 'mc/edit-lines)))
 #+END_SRC
 * markdown
 #+BEGIN_SRC emacs-lisp
-  (use-package markdown-mode
-    :ensure t
-    :commands (markdown-mode gfm-mode)
-    :mode (("README\\.md\\'" . gfm-mode)
-           ("\\.md\\'" . markdown-mode)
-           ("\\.markdown\\'" . markdown-mode))
-    :init (setq markdown-command "multimarkdown"))
+(use-package markdown-mode
+  :ensure t
+  :commands (markdown-mode gfm-mode)
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :init (setq markdown-command "multimarkdown"))
 #+END_SRC
 * google translate
 #+BEGIN_SRC emacs-lisp
@@ -404,7 +474,7 @@
   ;;   (global-set-key "\C-cT" 'google-translate-query-translate))
 
 #+END_SRC
-* font
+* COMMENT font
 #+BEGIN_SRC emacs-lisp
 
   (set-frame-font "d2coding" t)
@@ -430,41 +500,43 @@
   (setq org-html-htmlize-output-type 'css)
 #+END_SRC
 * ox-html
-
+#+begin_src emacs-lisp
 (with-eval-after-load "ox-html"
   (advice-add 'org-export-to-buffer :around 'my-with-theme))
+#+end_src
+
 * swiper
 #+BEGIN_SRC emacs-lisp
-  ;; it looks like counsel is a requirement for swiper
-  (use-package counsel
-    :ensure t
-    )
+;; it looks like counsel is a requirement for swiper
+(use-package counsel
+  :ensure t
+  )
 
-  (use-package swiper
-    :ensure t
-    :config
-    (progn
-      (ivy-mode 1)
-      (setq ivy-use-virtual-buffers t)
-      (global-set-key "\C-s" 'swiper)
-      (global-set-key (kbd "C-c C-r") 'ivy-resume)
-      (global-set-key (kbd "<f6>") 'ivy-resume)
-      (global-set-key (kbd "M-x") 'counsel-M-x)
-      (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-      (global-set-key (kbd "<f1> f") 'counsel-describe-function)
-      (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-      (global-set-key (kbd "<f1> l") 'counsel-load-library)
-      (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
-      (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
-      (global-set-key (kbd "C-c g") 'counsel-git)
-      (global-set-key (kbd "C-c j") 'counsel-git-grep)
-      (global-set-key (kbd "C-c k") 'counsel-ag)
-      (global-set-key (kbd "C-x l") 'counsel-locate)
-      (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
-      (define-key ivy-minibuffer-map (kbd "S-SPC") nil)
-      (define-key ivy-minibuffer-map (kbd "C-SPC") 'ivy-restrict-to-matches)
-      (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
-      ))
+(use-package swiper
+  :ensure t
+  :config
+  (progn
+    (ivy-mode 1)
+    (setq ivy-use-virtual-buffers t)
+    (global-set-key "\C-s" 'swiper)
+    (global-set-key (kbd "C-c C-r") 'ivy-resume)
+    (global-set-key (kbd "<f6>") 'ivy-resume)
+    (global-set-key (kbd "M-x") 'counsel-M-x)
+    (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+    (global-set-key (kbd "<f1> f") 'counsel-describe-function)
+    (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+    (global-set-key (kbd "<f1> l") 'counsel-load-library)
+    (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+    (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
+    (global-set-key (kbd "C-c g") 'counsel-git)
+    (global-set-key (kbd "C-c j") 'counsel-git-grep)
+    (global-set-key (kbd "C-c k") 'counsel-ag)
+    (global-set-key (kbd "C-x l") 'counsel-locate)
+    (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
+    (define-key ivy-minibuffer-map (kbd "S-SPC") nil)
+    (define-key ivy-minibuffer-map (kbd "C-SPC") 'ivy-restrict-to-matches)
+    (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+    ))
 #+END_SRC
 
 * ov
@@ -557,25 +629,24 @@
 
     (define-key z-map (kbd "w") 'z/swap-windows)
   #+end_src
-* paredit
+* COMMENT paredit
   #+begin_src emacs-lisp
-    (use-package paredit
-      :ensure t
-      :config 
-      (progn
-	(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
-	(add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
-	(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
-	(add-hook 'ielm-mode-hook             #'enable-paredit-mode)
-	(add-hook 'lisp-mode-hook             #'enable-paredit-mode)
-	(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
-	(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
-	(add-hook 'clojure-mode-hook          #'enable-paredit-mode)
-	(add-hook 'clojurescript-mode-hook    #'enable-paredit-mode)
-	(setq show-paren-mode 1)
-	))
-
-	
+  (use-package paredit
+    :ensure t
+    :config 
+    (progn
+      (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+      (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+      (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+      (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+      (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+      (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+      (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+      (add-hook 'clojure-mode-hook          #'enable-paredit-mode)
+      (add-hook 'clojurescript-mode-hook    #'enable-paredit-mode)
+      (add-hook 'minibuffer-setup-hook (lambda () (paredit-mode -1)))
+      (setq show-paren-mode 1)
+      ))
   #+end_src
 
 * magit
@@ -636,13 +707,14 @@
   #+end_src
 * file backup setting
   #+begin_src emacs-lisp
-    (setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
-      backup-by-copying t    ; Don't delink hardlinks
-      version-control t      ; Use version numbers on backups
-      delete-old-versions t  ; Automatically delete excess backups
-      kept-new-versions 20   ; how many of the newest versions to keep
-      kept-old-versions 5    ; and how many of the old
-      )
+  (setq backup-directory-alist `(("." . ,(concat user-emacs-directory
+						 "backups"))
+				 backup-by-copying t    ; Don't delink hardlinks
+				 version-control t      ; Use version numbers on backups
+				 delete-old-versions t  ; Automatically delete excess backups
+				 kept-new-versions 20   ; how many of the newest versions to keep
+				 kept-old-versions 5    ; and how many of the old
+				 ))
   #+end_src
 * shell pop
   #+begin_src emacs-lisp
@@ -656,7 +728,7 @@
     (use-package yaml-mode
       :ensure t)
   #+end_src
-* theme
+* COMMENT theme
 #+BEGIN_SRC emacs-lisp
   ;; 테마 설정
   (use-package dracula-theme
@@ -971,14 +1043,14 @@
   #+end_src
 * set temp file dir
   #+begin_src emacs-lisp
-    ;; disable auto-save and auto-backup
-    (setq create-lockfiles nil)
-    ;; (setq auto-save-default nil)
-    ;; (setq make-backup-files nil)
-    (setq backup-directory-alist
-	  `((".*" . ,temporary-file-directory)))
-    (setq auto-save-file-name-transforms
-	  `((".*" ,temporary-file-directory t)))
+  ;; disable auto-save and auto-backup
+  (setq create-lockfiles nil)
+  ;; (setq auto-save-default nil)
+  ;; (setq make-backup-files nil)
+  (setq backup-directory-alist
+        `((".*" . ,temporary-file-directory)))
+  (setq auto-save-file-name-transforms
+        `((".*" ,temporary-file-directory t)))
   #+end_src
   
 * COMMENT mozrepl
@@ -1076,3 +1148,130 @@
     )
 #+end_src
 
+
+* COMMENT for clojure
+
+  #+begin_src emacs-lisp
+  
+
+  ;; All other features are loaded one by one from
+  ;; the customizations directory. Read those files
+  ;; to find out what they do.
+  (add-to-list 'load-path "~/.emacs.d/customizations")
+
+  (defvar addons
+    '(
+      "editing.el"
+      "elisp-editing.el"
+      "setup-clojure.el"
+      "setup-js.el"
+      "shell-integration.el"
+      ))
+
+  (dolist (x addons)
+    (load x))
+
+  ;; Make gc pauses faster by decreasing the threshold.
+  (setq gc-cons-threshold (* 2 1000 1000))
+
+  (setq custom-file (concat user-emacs-directory "custom.el"))
+  (load custom-file 'noerror)
+  #+end_src
+
+* treemacs
+  #+begin_src emacs-lisp
+  ;; treemacs is a tree layout file explorer
+  ;; https://github.com/Alexander-Miller/treemacs
+  (use-package treemacs
+    :ensure t
+    :bind
+    ("M-0" . treemacs-select-window)
+    :config
+    ;; 필요한 추가 설정 작성
+    )
+
+  (use-package treemacs-projectile
+    :after treemacs
+    :ensure t)
+
+  (use-package treemacs-magit
+    :after treemacs
+    :ensure t)
+  #+end_src
+
+* lisp friendly editing
+  #+begin_src emacs-lisp
+  ;; Customizations relating to editing a buffer.
+
+  ;; Key binding to use "hippie expand" for text autocompletion
+  ;; http://www.emacswiki.org/emacs/HippieExpand
+  (global-set-key (kbd "M-/") 'hippie-expand)
+
+  ;; Lisp-friendly hippie expand
+  (setq hippie-expand-try-functions-list
+	'(try-expand-dabbrev ;; 현재 버퍼
+	  try-expand-dabbrev-all-buffers ;; 모든 버퍼
+	  try-expand-dabbrev-from-kill ;; 복사 히스토리 
+	  try-complete-lisp-symbol-partially ;; emacs lisp 심볼 부분 비교 
+	  try-complete-lisp-symbol)) ;; emacs lisp 심볼 비교 
+
+  ;; Highlights matching parenthesis
+  (show-paren-mode 1)
+
+  ;; Highlight current line
+  (global-hl-line-mode 1)
+
+  ;; line numbers
+  (global-display-line-numbers-mode 1)
+  ;; but not everywhere
+  (dolist (mode '(org-mode-hook
+		  term-mode-hook
+		  shell-mode-hook
+		  treemacs-mode-hook
+		  eshell-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+  ;; Don't use hard tabs
+  (setq-default indent-tabs-mode nil)
+
+  ;; shell scripts
+  (setq-default sh-basic-offset 2
+		sh-indentation 2)
+
+  ;; When you visit a file, point goes to the last place where it
+  ;; was when you previously visited the same file.
+  ;; http://www.emacswiki.org/emacs/SavePlace
+  (save-place-mode 1)
+  ;; keep track of saved places in ~/.emacs.d/places
+  (setq save-place-file (concat user-emacs-directory "places"))
+
+  ;; Emacs can automatically create backup files. This tells Emacs to
+  ;; put all backups in ~/.emacs.d/backups. More info:
+  ;; http://www.gnu.org/software/emacs/manual/html_node/elisp/Backup-Files.html
+  (setq auto-save-default nil)
+
+  ;; comments
+  (defun toggle-comment-on-line ()
+    "comment or uncomment current line"
+    (interactive)
+    (comment-or-uncomment-region (line-beginning-position) (line-end-position)))
+  (global-set-key (kbd "C-;") 'toggle-comment-on-line)
+
+  ;; use 2 spaces for tabs
+  (defun die-tabs ()
+    (interactive)
+    (set-variable 'tab-width 2)
+    (mark-whole-buffer)
+    (untabify (region-beginning) (region-end))
+    (keyboard-quit))
+
+  ;; fix weird os x kill error
+  (defun ns-get-pasteboard ()
+    "Returns the value of the pasteboard, or nil for unsupported formats."
+    (condition-case nil
+	(ns-get-selection-internal 'CLIPBOARD)
+      (quit nil)))
+
+  (setq electric-indent-mode nil)
+
+  #+end_src
