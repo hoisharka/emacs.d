@@ -223,7 +223,7 @@
   #+begin_src emacs-lisp
 (use-package vue-mode
   :ensure t
-  :config (progn 
+  :config (progn
             (setq js-indent-level 2)
             ))
   #+end_src
@@ -297,6 +297,9 @@
   ;; 	      (assq-delete-all :results org-babel-default-header-args))
   ;; 	)
   ;; )
+  (with-eval-after-load 'org
+        (define-key org-mode-map (kbd "<f5>") 'org-toggle-inline-images))
+      )
   )
 
 
@@ -633,7 +636,7 @@
   #+begin_src emacs-lisp
   (use-package paredit
     :ensure t
-    :config 
+    :config
     (progn
       (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
       (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
@@ -1152,7 +1155,7 @@
 * COMMENT for clojure
 
   #+begin_src emacs-lisp
-  
+
 
   ;; All other features are loaded one by one from
   ;; the customizations directory. Read those files
@@ -1211,9 +1214,9 @@
   (setq hippie-expand-try-functions-list
 	'(try-expand-dabbrev ;; 현재 버퍼
 	  try-expand-dabbrev-all-buffers ;; 모든 버퍼
-	  try-expand-dabbrev-from-kill ;; 복사 히스토리 
-	  try-complete-lisp-symbol-partially ;; emacs lisp 심볼 부분 비교 
-	  try-complete-lisp-symbol)) ;; emacs lisp 심볼 비교 
+	  try-expand-dabbrev-from-kill ;; 복사 히스토리
+	  try-complete-lisp-symbol-partially ;; emacs lisp 심볼 부분 비교
+	  try-complete-lisp-symbol)) ;; emacs lisp 심볼 비교
 
   ;; Highlights matching parenthesis
   (show-paren-mode 1)
