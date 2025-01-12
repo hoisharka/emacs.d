@@ -33,7 +33,12 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(ein ob-ipython ob-async emmet-mode js2-refactor ac-js2 yaml-mode yml shell-pop beacon git-timemachine git-gutter magit cider-hydra paredit ace-window adaptive-wrap ov counsel yasnippet-snippets which-key web-mode use-package try org-plus-contrib org-bullets org multiple-cursors material-theme markdown-mode leuven-theme js2-mode htmlize google-translate flycheck elpy dracula-theme better-defaults)))
+   '(org-tempo ess org-mode ein ob-ipython ob-async emmet-mode js2-refactor ac-js2 yaml-mode yml shell-pop beacon git-timemachine git-gutter magit cider-hydra paredit ace-window adaptive-wrap ov counsel yasnippet-snippets which-key web-mode use-package try org-plus-contrib org-bullets org multiple-cursors material-theme markdown-mode leuven-theme js2-mode htmlize google-translate flycheck elpy dracula-theme better-defaults))
+ '(safe-local-variable-values
+   '((eval progn
+           (make-variable-buffer-local 'cider-jack-in-nrepl-middlewares)
+           (add-to-list 'cider-jack-in-nrepl-middlewares "shadow.cljs.devtools.server.nrepl/middleware"))
+     (cider-clojure-clj-global-options . "-A:dev"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
